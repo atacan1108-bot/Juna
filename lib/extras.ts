@@ -36,6 +36,13 @@ export const SHOTJES: Record<ExtraDoel, Shotje[]> = {
   ],
 };
 
+export const UITLEG: Record<ExtraDoel, string> = {
+  huid: "Je huid bouwt mee met wat je eet. Vitamine A en C vind je in kleurrijk fruit en groente.",
+  haar: "Haar bestaat uit eiwit. Pitten en noten leveren eiwit en zink, groene bladgroente levert ijzer.",
+};
+
+export const MEEDENKEN = "Juna denkt mee bij je sapje en geeft je tips om erbij te doen.";
+
 export const SHOT_BEREIDING = "Pers de ingrediënten in je slow juicer, of mix ze met een scheut water en zeef ze. Je krijgt ongeveer 60 ml.";
 
 function hash(s: string) {

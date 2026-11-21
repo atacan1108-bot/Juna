@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ING } from "@/lib/ingredients";
-import { kiesExtra, SHOT_BEREIDING, type ExtraDoel } from "@/lib/extras";
+import { kiesExtra, MEEDENKEN, SHOT_BEREIDING, UITLEG, type ExtraDoel } from "@/lib/extras";
 import { extraStore, zetOpLijst } from "@/lib/mijn";
 
 const NAMEN: Record<ExtraDoel, string> = { huid: "Voor je huid", haar: "Voor je haar" };
@@ -17,7 +17,7 @@ export default function ExtraBlok({ uitgesloten, kleur, tint }: { uitgesloten: s
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <span className="eyebrow" style={{ color: "var(--muted)" }}>Extra voor je huid of haar</span>
         <span style={{ fontSize: 13, lineHeight: 1.45, color: "var(--ink-2)" }}>
-          Wil je er iets bij? Dat komt bovenop je sapje van de fase.
+          Wil je er iets bij? {MEEDENKEN} Het komt bovenop je sapje van de fase.
         </span>
       </div>
       <div className="segmented" role="group" aria-label="Kies een extra">
@@ -37,6 +37,7 @@ export default function ExtraBlok({ uitgesloten, kleur, tint }: { uitgesloten: s
       </div>
       {doel && keuze ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <span style={{ fontSize: 13.5, lineHeight: 1.45, color: "var(--ink-2)" }}>{UITLEG[doel]}</span>
           {keuze.toppings.length ? (
             <div style={{ borderRadius: 18, background: tint, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
               <strong style={{ fontSize: 15, color: kleur }}>Voeg dit toe aan je sapje</strong>
