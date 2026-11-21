@@ -23,7 +23,7 @@ export default function Home() {
         <nav aria-label="Hoofdmenu" className="site-nav">
           <a href="#hoe">Hoe het werkt</a>
           <a href="#fases">De 4 fases</a>
-          <a href="#glow">Glow &amp; haar</a>
+          <a href="#glow">Huid &amp; haar</a>
           <a href="#privacy">Jouw data</a>
         </nav>
         <Link href="/app" className="btn btn-dark btn-pill" style={{ minHeight: 46, fontSize: 15 }}>
@@ -99,7 +99,7 @@ export default function Home() {
               {[
                 { n: "1", c: "#F59CBD", t: "Vul je cyclus in", d: "Vul de eerste dag van je laatste menstruatie in. Meer heeft Juna niet nodig om te weten in welke fase je zit." },
                 { n: "2", c: "#9BD69A", t: "Krijg je sap van de week", d: "Elke fase een nieuw recept, met ingrediënten en een korte uitleg waarom het past bij wat je lichaam nu doet." },
-                { n: "3", c: "#F7B66E", t: "Glow & haar erbij", d: "Kies je doel – stralende huid of sterkere haargroei – en Juna voegt daar passende sapjes en tips aan toe." },
+                { n: "3", c: "#F7B66E", t: "Kies een extra", d: "Wil je extra aandacht voor je huid of je haar? Kies dat erbij. Juna geeft je sapjes en tips die bij je fase passen." },
               ].map((s) => (
                 <div key={s.n} className="step-card">
                   <span className="display" style={{ fontSize: 48, color: s.c }}>{s.n}</span>
@@ -151,11 +151,16 @@ export default function Home() {
 
         <section id="glow" style={{ background: "var(--berry-t)" }}>
           <div className="container section" style={{ display: "flex", flexDirection: "column", gap: 40 }}>
-            <h2 className="section-title">Kies je doel: glow of haar</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: 720 }}>
+              <h2 className="section-title">Extra steun voor je huid of haar</h2>
+              <p className="lead" style={{ fontSize: 18 }}>
+                Je sapje van de week volgt je cyclus. Wil je er iets extra&apos;s bij? Kies dan een extra voor je huid of je haar. Die komt erbovenop, niet in plaats van je fase.
+              </p>
+            </div>
             <div className="grid-auto-wide">
               {[
-                { title: "De Glow", icon: <IconSparkle size={26} color="#B35A0F" />, tile: "var(--orange-t)", text: "Voor een frisse, stralende huid: vitamine C voor collageen, bètacaroteen en veel vocht.", list: glow },
-                { title: "Haargroei", icon: <IconWave size={26} color="var(--green-d)" />, tile: "var(--green-t)", text: "Voor sterk, voller haar: ijzer, zink, biotine en eiwit – met voedingsrijke toppings op je smoothie.", list: hair },
+                { title: "Voor je huid", icon: <IconSparkle size={26} color="#B35A0F" />, tile: "var(--orange-t)", text: "Sapjes met vitamine C, bètacaroteen en veel vocht: voedzaam voor je huid. Veel mensen merken dat hun huid door de maand heen verandert, bijvoorbeeld rond je ovulatie of vlak voor je menstruatie.", list: glow },
+                { title: "Voor je haar", icon: <IconWave size={26} color="var(--green-d)" />, tile: "var(--green-t)", text: "Smoothies met ijzer, zink, biotine en eiwit, met voedingsrijke toppings. Juna belooft geen sneller of voller haar. Het zijn gewoon voedzame keuzes.", list: hair },
               ].map((g) => (
                 <div key={g.title} className="goal-card">
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
