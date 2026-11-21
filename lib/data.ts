@@ -96,7 +96,7 @@ export const PHASES: Phase[] = [
 export const RECIPES: Recipe[] = [
   {
     slug: "rode-reset",
-    name: "Rode Reset",
+    name: "Grow",
     kind: "sap",
     category: "fase",
     phase: "menstruatie",
@@ -140,7 +140,7 @@ export const RECIPES: Recipe[] = [
   },
   {
     slug: "groene-start",
-    name: "Groene Start",
+    name: "Restart",
     kind: "sap",
     category: "fase",
     phase: "folliculair",
@@ -180,7 +180,7 @@ export const RECIPES: Recipe[] = [
   },
   {
     slug: "gouden-zon",
-    name: "Gouden Zon",
+    name: "Glow",
     kind: "sap",
     category: "fase",
     phase: "ovulatie",
@@ -220,7 +220,7 @@ export const RECIPES: Recipe[] = [
   },
   {
     slug: "paarse-kalmte",
-    name: "Paarse Kalmte",
+    name: "Pause",
     kind: "smoothie",
     category: "fase",
     phase: "luteaal",

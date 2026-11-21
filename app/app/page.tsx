@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import CycleRing from "@/components/CycleRing";
+import FruitRain from "@/components/FruitRain";
 import { IconSparkle, IconWave } from "@/components/Icons";
 import { computeToday, useCycle } from "@/lib/cycle";
 import { getPhase, getRecipe } from "@/lib/data";
@@ -60,19 +61,17 @@ export default function Vandaag() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <h2 style={{ fontWeight: 700, fontSize: 20 }}>Jouw {recipe.kind === "smoothie" ? "smoothie" : "sap"} van deze week</h2>
-        <Link href={`/app/recept/${recipe.slug}`} className="recipe-hero" style={{ background: phase.color }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-            <div className="stack-dots" style={{ color: phase.color }}>
-              {recipe.colors.map((c, i) => (
-                <span key={i} style={{ background: c }} />
-              ))}
+        <div className="fr-card" style={{ background: phase.tint, color: "#2E1428" }}>
+          <FruitRain phase={phaseId} />
+          <Link href={`/app/recept/${recipe.slug}`} className="fr-info" style={{ textDecoration: "none", color: "inherit" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="display" style={{ fontSize: 32, color: phase.dark }}>{recipe.name}</span>
+              <span className="chip" style={{ background: "#fff", color: phase.dark }}>{recipe.minutes} min</span>
             </div>
-            <span className="chip" style={{ background: "#fff", color: phase.dark }}>{recipe.minutes} min</span>
-          </div>
-          <span className="display" style={{ fontSize: 26 }}>{recipe.name}</span>
-          <span style={{ fontSize: 14, lineHeight: 1.45 }}>{recipe.short}</span>
-          <span style={{ fontSize: 14, fontWeight: 700 }}>Bekijk recept →</span>
-        </Link>
+            <span style={{ fontSize: 14, lineHeight: 1.45 }}>{recipe.short}</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: phase.dark }}>Bekijk recept →</span>
+          </Link>
+        </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10 }}>
