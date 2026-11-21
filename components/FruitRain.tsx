@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Phase, PhaseId } from "@/lib/data";
 
+import { advies, type Machine } from "@/lib/advies";
 import { ING, schudSet, weekId, weekSet, type Ingredient } from "@/lib/ingredients";
 
 const OFFSET = 90; // de lege ruimte boven de stapel halen we weg
@@ -52,6 +53,17 @@ function build(ings: Ingredient[]) {
 
 const KEY = "juna.fruit.week";
 const SET_KEY = "juna.fruit.set.v1";
+const MACHINE_KEY = "juna.machine.v1";
+
+function loadMachine(): Machine {
+  try {
+    const m = localStorage.getItem(MACHINE_KEY);
+    if (m === "mixer" || m === "slowjuicer" || m === "beide") return m;
+  } catch {
+    /* ignore */
+  }
+  return "beide";
+}
 
 type Saved = { week: string; phase: PhaseId; sets: string[][] };
 
@@ -92,7 +104,19 @@ export default function FruitRain({ phase }: { phase: Phase & { recipeName: stri
   const [animate, setAnimate] = useState<boolean>(() => shouldPlay(phaseId));
   const [run, setRun] = useState(0);
   const [sets, setSets] = useState<string[][]>(() => loadSets(phaseId));
+  const [machine, setMachine] = useState<Machine>(() => loadMachine());
+  const [gesloten, setGesloten] = useState<string>("");
   const current = sets[sets.length - 1];
+  const adv = advies(current, machine);
+  const setKey = `${machine}:${current.join(",")}`;
+  const kiesMachine = (m: Machine) => {
+    setMachine(m);
+    try {
+      localStorage.setItem(MACHINE_KEY, m);
+    } catch {
+      /* opslag niet beschikbaar */
+    }
+  };
   const ings = current.map((id) => ING[id]);
   const { items, shadows, left, right } = build(ings);
 
@@ -186,8 +210,26 @@ export default function FruitRain({ phase }: { phase: Phase & { recipeName: stri
             </li>
           ))}
         </ul>
+        <p className="fr-tip">{adv.tip}</p>
+        <div className="fr-machine" role="group" aria-label="Welk apparaat heb je?">
+          <span>Ik heb:</span>
+          {([["beide", "Beide"], ["mixer", "Blender"], ["slowjuicer", "Slow juicer"]] as const).map(([m, t]) => (
+            <button key={m} type="button" aria-pressed={machine === m} onClick={() => kiesMachine(m)} style={machine === m ? { background: phase.dark, color: "#fff" } : undefined}>
+              {t}
+            </button>
+          ))}
+        </div>
         <span style={{ fontSize: 11, opacity: 0.7, lineHeight: 1.4 }}>Juna geeft geen medisch advies. Heb je klachten of gebruik je medicijnen? Overleg met je huisarts.</span>
       </div>
+      {adv.popup && gesloten !== setKey ? (
+        <div className="fr-popup-bg" role="dialog" aria-modal="true" aria-label={adv.popup.titel} onClick={() => setGesloten(setKey)}>
+          <div className="fr-popup" onClick={(e) => e.stopPropagation()}>
+            <strong>{adv.popup.titel}</strong>
+            <p>{adv.popup.tekst}</p>
+            <button type="button" onClick={() => setGesloten(setKey)} style={{ background: phase.dark }}>Begrepen</button>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

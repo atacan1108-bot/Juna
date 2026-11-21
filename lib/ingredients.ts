@@ -13,6 +13,10 @@ export type Ingredient = {
   rond?: boolean; // rolt weg
   klein?: boolean; // valt als kleine korrels/pitjes mee
   snede?: string; // bestandsnaam van de doorgesneden variant
+  /** hoeveel sap het geeft in een slow juicer: 0 geen, 1 weinig, 2 gemiddeld, 3 veel */
+  sap?: number;
+  /** pers = slow juicer, mix = blender, toevoegen = erbij strooien of roeren */
+  bereiding?: "pers" | "mix" | "toevoegen";
 };
 
 export const ING: Record<string, Ingredient> = {
@@ -58,26 +62,88 @@ export const ING: Record<string, Ingredient> = {
   fig: { id: "fig", naam: "Vijg", kleur: "#6B3A6E", soort: "fruit", reden: "Vezels en een beetje calcium." },
 };
 
-type Pool = { ids: string[]; ankers: string[] };
-
-export const POOLS: Record<PhaseId, Pool> = {
-  menstruatie: {
-    ids: ["beet", "pomegranate", "orange", "ginger", "celery", "strawberry", "cherry", "watermelon", "redpepper", "parsley", "lemon", "raspberry", "spinach"],
-    ankers: ["beet", "orange"],
-  },
-  folliculair: {
-    ids: ["spinach", "kiwi", "cucumber", "apple", "lime", "celery", "pear", "avocado", "fennel", "mint", "kale", "grape", "pineapple", "orange"],
-    ankers: ["spinach", "kiwi"],
-  },
-  ovulatie: {
-    ids: ["carrot", "pineapple", "orange", "turmeric", "pepper", "mango", "papaya", "apricot", "grapefruit", "tomato", "redpepper", "strawberry", "blueberry", "pumpkinseed"],
-    ankers: ["carrot", "orange"],
-  },
-  luteaal: {
-    ids: ["blueberry", "banana", "spinach", "cacao", "ginger", "fennel", "pear", "avocado", "almond", "date", "cinnamon", "mint", "fig", "raspberry", "papaya"],
-    ankers: ["banana", "cacao"],
-  },
+/* Elke combinatie hieronder is gebaseerd op bestaande sap- en smoothierecepten, zodat de
+   ingrediënten ook echt bij elkaar passen. Per fase wisselt Juna tussen deze combinaties. */
+export const COMBOS: Record<PhaseId, string[][]> = {
+  menstruatie: [
+    ["beet", "orange", "ginger", "carrot"],
+    ["beet", "apple", "ginger", "orange"],
+    ["beet", "celery", "apple", "ginger"],
+    ["beet", "apple", "lemon", "ginger"],
+    ["beet", "pomegranate", "orange", "ginger"],
+    ["orange", "carrot", "apple", "ginger"],
+    ["celery", "apple", "orange", "ginger"],
+    ["watermelon", "cherry", "strawberry", "lemon"],
+    ["pomegranate", "watermelon", "strawberry", "raspberry"],
+    ["cherry", "pomegranate", "watermelon", "lemon"],
+    ["pomegranate", "orange", "pineapple", "lemon"],
+    ["orange", "pineapple", "strawberry", "lemon"],
+    ["spinach", "orange", "pineapple", "apple"],
+    ["spinach", "parsley", "celery", "apple"],
+    ["redpepper", "carrot", "orange", "apple"],
+  ],
+  folliculair: [
+    ["spinach", "cucumber", "apple", "mint"],
+    ["spinach", "kiwi", "cucumber", "apple"],
+    ["fennel", "apple", "cucumber", "lime"],
+    ["cucumber", "mint", "pear", "lime"],
+    ["celery", "cucumber", "apple", "lime"],
+    ["kale", "celery", "apple", "cucumber"],
+    ["fennel", "grape", "apple", "mint"],
+    ["pineapple", "cucumber", "mint", "lime"],
+    ["kiwi", "grape", "apple", "lime"],
+    ["avocado", "spinach", "pear", "lime"],
+    ["kale", "pear", "cucumber", "lime"],
+    ["spinach", "pineapple", "orange", "kiwi"],
+    ["celery", "cucumber", "fennel", "mint"],
+  ],
+  ovulatie: [
+    ["carrot", "orange", "turmeric", "pepper"],
+    ["carrot", "pineapple", "orange", "turmeric"],
+    ["pineapple", "mango", "orange", "turmeric"],
+    ["carrot", "orange", "mango", "turmeric"],
+    ["carrot", "orange", "mango", "apricot"],
+    ["grapefruit", "orange", "carrot", "pineapple"],
+    ["pineapple", "mango", "papaya", "orange"],
+    ["strawberry", "pineapple", "orange", "mango"],
+    ["tomato", "carrot", "redpepper", "pepper"],
+    ["redpepper", "carrot", "orange", "turmeric"],
+    ["blueberry", "strawberry", "orange", "mango"],
+    ["carrot", "orange", "mango", "pumpkinseed"],
+  ],
+  luteaal: [
+    ["banana", "cacao", "almond", "date"],
+    ["blueberry", "banana", "spinach", "cacao"],
+    ["blueberry", "banana", "date", "spinach"],
+    ["banana", "spinach", "cacao", "date"],
+    ["banana", "almond", "date", "cinnamon"],
+    ["pear", "apple", "ginger", "cinnamon"],
+    ["fennel", "pear", "mint", "ginger"],
+    ["raspberry", "banana", "cacao", "almond"],
+    ["fig", "banana", "almond", "cinnamon"],
+    ["papaya", "pear", "mint", "ginger"],
+    ["avocado", "spinach", "banana", "cacao"],
+    ["blueberry", "raspberry", "banana", "almond"],
+    ["cacao", "raspberry", "date", "almond"],
+  ],
 };
+
+/* sap-gehalte en bereiding per ingrediënt */
+const SAP: Record<string, [number, "pers" | "mix" | "toevoegen"]> = {
+  orange: [3, "pers"], apple: [3, "pers"], pineapple: [3, "pers"], grapefruit: [3, "pers"], lemon: [3, "pers"], lime: [3, "pers"],
+  cucumber: [3, "pers"], celery: [3, "pers"], watermelon: [3, "pers"], carrot: [3, "pers"], tomato: [3, "pers"], grape: [3, "pers"], pear: [3, "pers"],
+  pomegranate: [2, "pers"], kiwi: [2, "pers"], cherry: [2, "pers"], strawberry: [2, "pers"], redpepper: [2, "pers"], beet: [2, "pers"], fennel: [2, "pers"],
+  apricot: [1, "pers"], raspberry: [1, "pers"], blueberry: [1, "pers"], spinach: [1, "pers"], kale: [1, "pers"], parsley: [1, "pers"], mint: [1, "pers"],
+  ginger: [1, "pers"], turmeric: [1, "pers"], papaya: [1, "mix"],
+  mango: [0, "mix"], banana: [0, "mix"], avocado: [0, "mix"], fig: [0, "mix"], date: [0, "mix"], almond: [0, "mix"],
+  cacao: [0, "toevoegen"], cinnamon: [0, "toevoegen"], pepper: [0, "toevoegen"], pumpkinseed: [0, "toevoegen"],
+};
+for (const [id, [sap, bereiding]] of Object.entries(SAP)) {
+  if (ING[id]) {
+    ING[id].sap = sap;
+    ING[id].bereiding = bereiding;
+  }
+}
 
 /* ---------- vaste "willekeurigheid" (zelfde invoer = zelfde uitkomst) ---------- */
 function hash(s: string) {
@@ -99,41 +165,22 @@ function rng(seed: number) {
   };
 }
 
-function valid(set: Ingredient[], pool: Pool): boolean {
-  const ids = set.map((i) => i.id);
-  if (!ids.some((id) => pool.ankers.includes(id))) return false;
-  if (!set.some((i) => i.soort === "fruit")) return false;
-  if (!set.some((i) => i.soort === "groente")) return false;
-  if (!set.some((i) => i.rond)) return false;
-  if (set.filter((i) => !i.klein).length < 3) return false;
-  if (ids.includes("pepper") && !ids.includes("turmeric")) return false;
-  const groepen = set.map((i) => i.groep).filter(Boolean) as string[];
-  if (new Set(groepen).size !== groepen.length) return false;
-  return true;
-}
-
 function overlap(a: string[], b: string[]) {
   return a.filter((x) => b.includes(x)).length;
 }
+const zelfde = (a: string[], b: string[]) => a.length === b.length && a.every((x) => b.includes(x));
 
-/** Kiest 4 ingrediënten. `vermijd` zijn eerdere sets waar de nieuwe duidelijk van moet verschillen. */
+/** Kiest een combinatie. `vermijd` zijn eerdere sets waar de nieuwe duidelijk van moet verschillen. */
 export function kiesSet(phase: PhaseId, seedText: string, vermijd: string[][] = []): string[] {
-  const pool = POOLS[phase];
-  let best: string[] | null = null;
-  for (let t = 0; t < 400; t++) {
-    const r = rng(hash(seedText + "#" + t));
-    const ids = [...pool.ids];
-    for (let i = ids.length - 1; i > 0; i--) {
-      const j = Math.floor(r() * (i + 1));
-      [ids[i], ids[j]] = [ids[j], ids[i]];
-    }
-    const pick = ids.slice(0, 4);
-    const set = pick.map((id) => ING[id]);
-    if (!valid(set, pool)) continue;
-    if (!best) best = pick;
-    if (vermijd.every((v, k) => overlap(pick, v) <= (k === vermijd.length - 1 ? 1 : 2))) return pick;
-  }
-  return best ?? pool.ids.slice(0, 4);
+  const combos = COMBOS[phase];
+  const r = rng(hash(seedText));
+  const volgorde = combos.map((c, i) => ({ c, k: r() + i * 0 })).sort((x, y) => x.k - y.k).map((x) => x.c);
+  const laatste = vermijd[vermijd.length - 1];
+  const kandidaat =
+    volgorde.find((c) => !vermijd.some((v) => zelfde(v, c)) && (!laatste || overlap(c, laatste) <= 2)) ??
+    volgorde.find((c) => !vermijd.some((v) => zelfde(v, c))) ??
+    volgorde[0];
+  return [...kandidaat];
 }
 
 export function weekId(d = new Date()) {
