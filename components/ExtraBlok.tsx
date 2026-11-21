@@ -60,24 +60,24 @@ export default function ExtraBlok({ uitgesloten, kleur, tint }: { uitgesloten: s
               </button>
             </div>
           ) : null}
-          {keuze.shot ? (
-            <div style={{ borderRadius: 18, background: "#fff", border: `1px solid ${tint}`, padding: 14, display: "flex", flexDirection: "column", gap: 6 }}>
+          {keuze.shots.map((shot) => (
+            <div key={shot.naam} style={{ borderRadius: 18, background: "#fff", border: `1px solid ${tint}`, padding: 14, display: "flex", flexDirection: "column", gap: 6 }}>
               <strong style={{ fontSize: 15, color: kleur }}>Of maak een shotje</strong>
-              <span className="display" style={{ fontSize: 20 }}>{keuze.shot.naam}</span>
-              <span style={{ fontSize: 13, lineHeight: 1.4 }}>{keuze.shot.hoeveel}</span>
-              <span style={{ fontSize: 13, lineHeight: 1.4, color: "var(--muted)" }}>{keuze.shot.reden}</span>
+              <span className="display" style={{ fontSize: 20 }}>{shot.naam}</span>
+              <span style={{ fontSize: 13, lineHeight: 1.4 }}>{shot.hoeveel}</span>
+              <span style={{ fontSize: 13, lineHeight: 1.4, color: "var(--muted)" }}>{shot.reden}</span>
               <span style={{ fontSize: 12.5, lineHeight: 1.4, color: "var(--muted)" }}>{SHOT_BEREIDING}</span>
               <button
                 type="button"
                 className="btn btn-light"
                 style={{ minHeight: 44, borderRadius: 14, fontSize: 14 }}
-                onClick={() => setStatus(zetOpLijst(keuze.shot!.ids, "Extra") ? "Op je boodschappenlijstje gezet." : "Stond al op je lijstje.")}
+                onClick={() => setStatus(zetOpLijst(shot.ids, "Extra") ? "Op je boodschappenlijstje gezet." : "Stond al op je lijstje.")}
               >
                 Zet op lijstje
               </button>
             </div>
-          ) : null}
-          {!keuze.toppings.length && !keuze.shot ? (
+          ))}
+          {!keuze.toppings.length && !keuze.shots.length ? (
             <p style={{ fontSize: 14, lineHeight: 1.5 }}>Met jouw allergieën en voorkeuren heeft Juna nu geen extra gevonden. Pas je voorkeuren aan.</p>
           ) : null}
           <span role="status" aria-live="polite" style={{ fontSize: 13, minHeight: 16 }}>{status}</span>
