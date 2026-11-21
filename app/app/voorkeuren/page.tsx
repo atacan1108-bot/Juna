@@ -7,12 +7,14 @@ import VoorkeurKiezer from "@/components/VoorkeurKiezer";
 import { IconLock } from "@/components/Icons";
 import { beschikbaar } from "@/lib/ingredients";
 import { PHASES, getRecipe } from "@/lib/data";
+import { useCycle } from "@/lib/cycle";
 import { saveVoorkeuren, useVoorkeuren } from "@/lib/voorkeuren";
 
 function Inhoud() {
   const router = useRouter();
   const eerst = useSearchParams().get("eerst") === "1";
   const { allergie, nietLekker, uitgesloten } = useVoorkeuren();
+  const cycle = useCycle();
 
   const telling = PHASES.map((p) => ({ naam: getRecipe(p.recipes[0])?.name ?? p.label, label: p.label, n: beschikbaar(p.id, uitgesloten).length }));
   const leeg = telling.filter((t) => t.n === 0);
@@ -64,7 +66,7 @@ function Inhoud() {
         </span>
       </div>
 
-      <button type="button" className="btn btn-dark btn-block" style={{ minHeight: 56, borderRadius: 18 }} onClick={() => router.push("/app")}>
+      <button type="button" className="btn btn-dark btn-block" style={{ minHeight: 56, borderRadius: 18 }} onClick={() => router.push(cycle ? "/app" : "/app/koppelen")}>
         {eerst ? "Klaar, toon mijn sap" : "Opslaan en terug"}
       </button>
       {eerst && (

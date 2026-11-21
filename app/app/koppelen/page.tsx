@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { IconLock } from "@/components/Icons";
 import { checkStarts, clearCycle, gemiddelden, loadHistory, saveCycle, saveHistory, useCycle } from "@/lib/cycle";
-import { clearVoorkeuren } from "@/lib/voorkeuren";
+import VoorkeurKiezer from "@/components/VoorkeurKiezer";
+import { clearVoorkeuren, saveVoorkeuren, useVoorkeuren } from "@/lib/voorkeuren";
 
 function isoDaysAgo(n: number) {
   const d = new Date();
@@ -13,6 +13,23 @@ function isoDaysAgo(n: number) {
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${d.getFullYear()}-${m}-${day}`;
+}
+
+/** De dag in de maand ervoor (zelfde dag, of de laatste dag van die maand). */
+function maandErvoor(iso: string) {
+  if (!iso) return "";
+  const [j, m, d] = iso.split("-").map(Number);
+  const t = new Date(j, m - 2, 1);
+  const laatste = new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate();
+  t.setDate(Math.min(d, laatste));
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+}
+
+const MAANDEN = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
+function maandNaam(iso: string) {
+  if (!iso) return "";
+  const [j, m] = iso.split("-").map(Number);
+  return `${MAANDEN[m - 1]} ${j}`;
 }
 
 const CONNECTORS = [
@@ -24,6 +41,7 @@ const CONNECTORS = [
 export default function Koppelen() {
   const router = useRouter();
   const cycle = useCycle();
+  const { allergie, nietLekker } = useVoorkeuren();
   const [start, setStart] = useState("");
   const [today, setToday] = useState<string | undefined>(undefined);
   const [length, setLength] = useState(28);
@@ -64,10 +82,9 @@ export default function Koppelen() {
     if (alle.some((d) => d && d > isoDaysAgo(0))) return setError("Een datum ligt in de toekomst.");
     const fout = checkStarts([...alle].sort().reverse(), isoDaysAgo(0));
     if (fout) return setError(fout);
-    const nieuw = !cycle;
     saveHistory(eerder.map((r) => ({ start: r.start, periodLength: r.period ? Number(r.period) : undefined })));
     saveCycle({ lastPeriodStart: start, cycleLength: eigenLengte, periodLength: eigenPeriode, irregular: calc?.irregular });
-    router.push(nieuw ? "/app/voorkeuren?eerst=1" : "/app");
+    router.push("/app");
   }
 
   return (
@@ -110,7 +127,7 @@ export default function Koppelen() {
         <span style={{ flex: 1, height: 1, background: "#E6D5DF" }} />
       </div>
 
-      <form onSubmit={submit} className="card" style={{ display: "flex", flexDirection: "column", gap: 16, borderRadius: 22 }} noValidate>
+      <form id="cyclus" onSubmit={submit} className="card" style={{ display: "flex", flexDirection: "column", gap: 16, borderRadius: 22 }} noValidate>
         <div className="field">
           <label htmlFor="start">Eerste dag van je laatste menstruatie</label>
           <input id="start" type="date" value={start} max={today} onChange={(e) => setStart(e.target.value)} required />
@@ -119,12 +136,12 @@ export default function Koppelen() {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <strong style={{ fontSize: 15 }}>Eerdere menstruaties (optioneel)</strong>
           <span style={{ fontSize: 13, lineHeight: 1.45, color: "var(--ink-2)" }}>
-            Weet je ook de maanden daarvoor? Voeg ze toe en Juna rekent je gemiddelde cyclus uit, zodat het advies beter past.
+            Weet je ook de maanden daarvoor? Voeg ze toe en Juna rekent je gemiddelde cyclus uit. Elke nieuwe rij begint bij de maand ervoor. Pas de dag aan als die niet klopt.
           </span>
           {eerder.map((r, i) => (
             <div key={i} style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 72px 44px", gap: 8, alignItems: "end" }}>
               <div className="field">
-                <label htmlFor={`e${i}`}>{i + 1} {i === 0 ? "maand" : "maanden"} eerder</label>
+                <label htmlFor={`e${i}`}>{r.start ? `Menstruatie in ${maandNaam(r.start)}` : `${i + 1} ${i === 0 ? "maand" : "maanden"} eerder`}</label>
                 <input id={`e${i}`} type="date" value={r.start} max={today} onChange={(ev) => setEerder((l) => l.map((x, j) => (j === i ? { ...x, start: ev.target.value } : x)))} />
               </div>
               <div className="field">
@@ -137,7 +154,7 @@ export default function Koppelen() {
             </div>
           ))}
           {eerder.length < 11 && (
-            <button type="button" className="btn btn-light" style={{ minHeight: 44, borderRadius: 14, fontSize: 14 }} onClick={() => setEerder((l) => [...l, { start: "", period: "" }])}>
+            <button type="button" className="btn btn-light" style={{ minHeight: 44, borderRadius: 14, fontSize: 14 }} onClick={() => setEerder((l) => [...l, { start: maandErvoor(l.length ? l[l.length - 1].start || start : start), period: "" }])}>
               Maand eerder toevoegen
             </button>
           )}
@@ -160,17 +177,23 @@ export default function Koppelen() {
             <span id="per-hint" className="hint">{calc?.periodLength ? "berekend uit je maanden" : "dagen (meestal 5)"}</span>
           </div>
         </div>
+      </form>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 4 }}>
+        <h2 className="display" style={{ fontSize: 24, lineHeight: 1.1 }}>Eten dat je liever mijdt</h2>
+        <span style={{ fontSize: 14, lineHeight: 1.45, color: "var(--ink-2)" }}>Optioneel. Dit kun je later altijd aanpassen.</span>
+      </div>
+      <VoorkeurKiezer id="allergie" titel="Allergie of intolerantie" uitleg="Hier laat Juna het ingrediënt altijd weg. Controleer bij een ernstige allergie altijd zelf de verpakking." waarde={allergie} anderen={nietLekker} onChange={(ids) => saveVoorkeuren({ allergie: ids, nietLekker: nietLekker.filter((x) => !ids.includes(x)) })} />
+      <VoorkeurKiezer id="nietlekker" titel="Dit vind ik niet lekker" uitleg="Een smaakkeuze. Juna laat dit weg uit jouw sapjes." waarde={nietLekker} anderen={allergie} onChange={(ids) => saveVoorkeuren({ allergie, nietLekker: ids })} />
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {error && (
           <p role="alert" style={{ color: "var(--berry-d)", fontSize: 14, fontWeight: 700 }}>{error}</p>
         )}
-        <button type="submit" className="btn btn-dark btn-block" style={{ minHeight: 56, borderRadius: 18 }}>
+        <button type="submit" form="cyclus" className="btn btn-dark btn-block" style={{ minHeight: 56, borderRadius: 18 }}>
           Toon mijn sap van deze week
         </button>
-      </form>
-
-      <Link href="/app/voorkeuren" className="btn btn-light btn-block" style={{ minHeight: 48, borderRadius: 16, fontSize: 15 }}>
-        Allergieën en voorkeuren
-      </Link>
+      </div>
 
       <div style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "0 4px" }}>
         <IconLock size={20} color="var(--violet-d)" />

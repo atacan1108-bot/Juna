@@ -50,6 +50,12 @@ export default function VoorkeurKiezer({ id, titel, uitleg, waarde, onChange, an
           placeholder="Typ bijvoorbeeld kiw of pomp"
           value={invoer}
           onChange={(e) => setInvoer(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              if (suggesties[0]) voegToe([suggesties[0].id]);
+            }
+          }}
           aria-controls={`${id}-lijst`}
         />
         {suggesties.length > 0 && (
