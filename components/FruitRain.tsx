@@ -5,6 +5,7 @@ import type { Phase, PhaseId } from "@/lib/data";
 
 import { ING, schudSet, weekId, weekSet, type Ingredient } from "@/lib/ingredients";
 
+const OFFSET = 90; // de lege ruimte boven de stapel halen we weg
 const W = 390; // breedte van het ontwerp in px; alles hieronder schaalt mee via cqw
 const cq = (px: number) => `${((px / W) * 100).toFixed(3)}cqw`;
 const frac = (x: number) => x - Math.floor(x);
@@ -129,7 +130,7 @@ export default function FruitRain({ phase }: { phase: Phase & { recipeName: stri
 
   const box = (p: Piece) => ({
     left: cq(p.left),
-    top: cq(p.top),
+    top: cq(p.top - OFFSET),
     width: cq(p.size),
     height: cq(p.size),
   });
@@ -141,7 +142,7 @@ export default function FruitRain({ phase }: { phase: Phase & { recipeName: stri
           <span
             key={`s${i}`}
             className={animate ? "fr-shade fr-anim" : "fr-shade"}
-            style={{ left: cq(sh.left), top: cq(436), width: cq(sh.w), height: cq(8), animationDelay: `${sh.delay.toFixed(2)}s` }}
+            style={{ left: cq(sh.left), top: cq(436 - OFFSET), width: cq(sh.w), height: cq(8), animationDelay: `${sh.delay.toFixed(2)}s` }}
           />
         ))}
         {items.map((p, i) => (

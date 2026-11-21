@@ -240,7 +240,7 @@ export const RECIPES: Recipe[] = [
       "Mix 45 seconden tot het romig is.",
       "Schenk in een glas en strooi de pompoenpitten erover.",
     ],
-    why: "In je luteale fase is progesteron hoog en kan je lichaam meer magnesium gebruiken. Cacao en spinazie leveren magnesium, banaan vitamine B6 – samen kunnen ze PMS en zoetbehoefte verzachten.",
+    why: "In je luteale fase is progesteron hoog en kan je lichaam meer magnesium gebruiken. Cacao en spinazie leveren magnesium en banaan vitamine B6. Of dat PMS-klachten verzacht is niet bewezen, maar het zijn voedzame keuzes die lekker zoet zijn zonder extra suiker.",
   },
   {
     slug: "zoete-wortel",
