@@ -43,8 +43,8 @@ export const PHASES: Phase[] = [
     energy: 1,
     hormone: "Oestrogeen & progesteron laag",
     body: "Je lichaam ruimt op en verliest ijzer. Rust, warmte en aanvullen staan centraal.",
-    skin: "Huid kan droger en gevoeliger zijn. Kies voor vocht en milde ingrediënten.",
-    hair: "Vul je ijzer aan – een tekort kan haaruitval in de hand werken.",
+    skin: "Veel mensen vinden hun huid nu droger of gevoeliger. Vochtrijke, milde keuzes voelen fijn.",
+    hair: "Een gevarieerd eetpatroon met eiwit, ijzer en zink is een goede basis.",
     recipes: ["rode-reset", "warme-peer"],
   },
   {
@@ -58,8 +58,8 @@ export const PHASES: Phase[] = [
     energy: 3,
     hormone: "Oestrogeen stijgt",
     body: "Je energie komt terug en je hebt zin in nieuwe dingen. Licht, fris en groen past nu.",
-    skin: "Je huid wordt steeds helderder. Vitamine C helpt de aanmaak van collageen.",
-    hair: "Goed moment om met je haarroutine te starten: eiwit en biotine.",
+    skin: "Veel mensen vinden hun huid in deze fase frisser. Fruit met vitamine C hoort bij gevarieerd eten.",
+    hair: "Een gevarieerd eetpatroon met eiwit, ijzer en zink is een goede basis.",
     recipes: ["groene-start", "citrus-kick"],
   },
   {
@@ -73,8 +73,8 @@ export const PHASES: Phase[] = [
     energy: 4,
     hormone: "Oestrogeen piekt",
     body: "Je voelt je vaak op je best en je huid straalt. Houd die glow vast met antioxidanten.",
-    skin: "Glow-piek! Antioxidanten helpen je huid te beschermen.",
-    hair: "Zink en vitamine C ondersteunen je haarzakjes.",
+    skin: "Veel mensen vinden hun huid rond de ovulatie op zijn mooist. Fruit en groente horen bij gevarieerd eten.",
+    hair: "Een gevarieerd eetpatroon met eiwit, ijzer en zink is een goede basis.",
     recipes: ["gouden-zon", "rode-bessen-glow"],
   },
   {
@@ -88,8 +88,8 @@ export const PHASES: Phase[] = [
     energy: 2,
     hormone: "Progesteron hoog",
     body: "Meer trek in zoet, een opgeblazen gevoel of PMS? Kies voor rust en magnesium.",
-    skin: "Huid kan vetter zijn. Kies vandaag voor komkommer en munt, en weinig suiker.",
-    hair: "Strooi pompoenpitten over je smoothie voor extra zink.",
+    skin: "Veel mensen krijgen vlak voor hun menstruatie een vettere huid. Komkommer en munt zijn lekker fris.",
+    hair: "Een gevarieerd eetpatroon met eiwit, ijzer en zink is een goede basis.",
     recipes: ["paarse-kalmte", "zoete-wortel"],
   },
 ];

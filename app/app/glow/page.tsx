@@ -19,11 +19,12 @@ function GlowInner() {
 
   return (
     <main className="app-main" style={{ gap: 16 }}>
-      <h1 className="display" style={{ fontSize: 30 }}>Glow &amp; haar</h1>
+      <h1 className="display" style={{ fontSize: 30 }}>Extra voor huid of haar</h1>
+      <p style={{ fontSize: 14, lineHeight: 1.5, color: "var(--ink-2)", margin: 0 }}>Je sapje van de week volgt je cyclus. Hier kies je er iets extra's bij. Dat komt erbovenop, niet in plaats van je fase.</p>
 
-      <div className="segmented" role="group" aria-label="Kies je doel">
-        <button type="button" aria-pressed={isGlow} onClick={() => setGoal("glow")}>De Glow</button>
-        <button type="button" aria-pressed={!isGlow} onClick={() => setGoal("haar")}>Haargroei</button>
+      <div className="segmented" role="group" aria-label="Kies je extra">
+        <button type="button" aria-pressed={isGlow} onClick={() => setGoal("glow")}>Voor je huid</button>
+        <button type="button" aria-pressed={!isGlow} onClick={() => setGoal("haar")}>Voor je haar</button>
       </div>
 
       <div style={{ borderRadius: 26, background: isGlow ? "var(--orange-t)" : "var(--green-t)", padding: 18, display: "flex", gap: 14, alignItems: "center" }}>
@@ -32,21 +33,19 @@ function GlowInner() {
         </span>
         <span style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <strong style={{ fontSize: 16 }}>
-            {phase ? `Je ${isGlow ? "huid" : "haar"} in de ${phase.label.toLowerCase()}` : isGlow ? "Voor een stralende huid" : "Voor sterk, voller haar"}
+            {isGlow ? (phase ? `Je huid in de ${phase.label.toLowerCase()}` : "Voor je huid") : "Voor je haar"}
           </strong>
           <span style={{ fontSize: 13, lineHeight: 1.4, color: "var(--ink-2)" }}>
-            {phase
-              ? isGlow
+            {isGlow
+              ? phase
                 ? phase.skin
-                : phase.hair
-              : isGlow
-                ? "Vitamine C voor collageen, bètacaroteen en veel vocht."
-                : "IJzer, zink, biotine en eiwit – met voedingsrijke toppings."}
+                : "Sapjes met vitamine C, bètacaroteen en veel vocht."
+              : "Smoothies met ijzer, zink, biotine en eiwit. Juna belooft geen sneller of voller haar, het zijn voedzame keuzes."}
           </span>
         </span>
       </div>
 
-      <h2 style={{ fontWeight: 700, fontSize: 19 }}>{isGlow ? "Glow-sapjes" : "Haar-smoothies"}</h2>
+      <h2 style={{ fontWeight: 700, fontSize: 19 }}>{isGlow ? "Sapjes voor je huid" : "Smoothies voor je haar"}</h2>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {list.map((r) => (
           <Link key={r.slug} href={`/app/recept/${r.slug}`} className="list-recipe">

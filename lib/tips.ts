@@ -25,8 +25,8 @@ export const TIPS: Record<PhaseId, Tip[]> = {
     { soort: "Drinken", tekst: "Komkommer en munt in je waterfles maken drinken makkelijker.", bevat: ["cucumber", "mint"] },
   ],
   ovulatie: [
-    { soort: "Huid", tekst: "Glow-piek! Antioxidanten helpen je huid te beschermen." },
-    { soort: "Haar", tekst: "Zink en vitamine C ondersteunen je haarzakjes." },
+    { soort: "Huid", tekst: "Veel mensen vinden hun huid nu op zijn mooist. Fruit en groente horen bij gevarieerd eten." },
+    { soort: "Haar", tekst: "Zink zit in pompoenpitten, noten en peulvruchten. Een gevarieerd eetpatroon is een goede basis voor je haar." },
     { soort: "Beweging", tekst: "Pittig sporten mag als jij je goed voelt. Warm wel goed op." },
     { soort: "Voeding", tekst: "Eet kleurrijk: hoe meer kleuren op je bord, hoe gevarieerder je vitamines." },
     { soort: "Drinken", tekst: "Genoeg water helpt je huid soepel te blijven." },

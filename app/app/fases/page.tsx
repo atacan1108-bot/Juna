@@ -74,15 +74,9 @@ export default function Fases() {
           </span>
           <span style={{ fontSize: 12, color: "var(--ink-2)" }}>{p.hormone}</span>
         </div>
-        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
-          <div style={{ background: "#fff", borderRadius: 16, padding: 12, fontSize: 13, lineHeight: 1.4 }}>
-            <strong style={{ display: "block", marginBottom: 4 }}>Huid</strong>
-            {p.skin}
-          </div>
-          <div style={{ background: "#fff", borderRadius: 16, padding: 12, fontSize: 13, lineHeight: 1.4 }}>
-            <strong style={{ display: "block", marginBottom: 4 }}>Haar</strong>
-            {p.hair}
-          </div>
+        <div style={{ background: "#fff", borderRadius: 16, padding: 12, fontSize: 13, lineHeight: 1.4 }}>
+          <strong style={{ display: "block", marginBottom: 4 }}>Huid</strong>
+          {p.skin}
         </div>
       </section>
 

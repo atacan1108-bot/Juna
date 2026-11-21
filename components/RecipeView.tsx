@@ -21,7 +21,7 @@ export default function RecipeView({ recipe }: { recipe: Recipe }) {
   const color = phase?.color ?? (recipe.category === "glow" ? "#E07A1F" : "#3F8F4E");
   const tint = phase?.tint ?? (recipe.category === "glow" ? "#FDEBD6" : "#E2F1E0");
   const dark = phase?.dark ?? (recipe.category === "glow" ? "#8F4A0C" : "#2F6E3B");
-  const tag = phase ? `${phase.label} · ${recipe.kind}` : `${recipe.category === "glow" ? "Glow" : "Haar"} · ${recipe.kind}`;
+  const tag = phase ? `${phase.label} · ${recipe.kind}` : `${recipe.category === "glow" ? "Huid" : "Haar"} · ${recipe.kind}`;
 
   const [fav, setFav] = useState(false);
   const [done, setDone] = useState<number[]>([]);
