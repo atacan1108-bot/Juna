@@ -230,7 +230,7 @@ export default function Lijstje() {
           </span>
           <span style={{ fontSize: 13, lineHeight: 1.45 }}>Meer sap dan je opkrijgt? Vries het in porties in.</span>
           <span style={{ fontSize: 12.5, lineHeight: 1.45, color: "var(--muted)" }}>
-            Voor jonge kinderen, zwangeren en ouderen is het veiliger om vers sap dezelfde dag te drinken.
+            Vers sap is niet gepasteuriseerd. Houd je daarom aan de bewaartijd en zet het meteen koud weg.
           </span>
         </div>
       <span style={{ fontSize: 12.5, lineHeight: 1.45, color: "var(--ink-2)" }}>
