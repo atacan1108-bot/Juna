@@ -74,7 +74,7 @@ export default function Home() {
                       <span key={c} className="dot" style={{ width: 44, height: 44, background: c }} />
                     ))}
                   </div>
-                  <span className="display" style={{ fontSize: 22 }}>Pause</span>
+                  <span className="display" style={{ fontSize: 22 }}>Cozy</span>
                   <span style={{ fontSize: 13, lineHeight: 1.45 }}>
                     Blauwe bes, banaan, spinazie &amp; cacao. Rijk aan magnesium voor de dagen voor je menstruatie.
                   </span>
