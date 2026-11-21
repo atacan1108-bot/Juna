@@ -16,7 +16,7 @@ export const TIPS: Record<PhaseId, Tip[]> = {
     { soort: "Let op", tekst: "Heel hevige pijn of bloedingen? Praat daarover met je huisarts." },
   ],
   folliculair: [
-    { soort: "Energie", tekst: "Veel mensen voelen zich in deze fase energieker. Een fijn moment om iets nieuws te starten." },
+    { soort: "Energie", tekst: "Na je menstruatie stijgt je oestrogeen weer. Een fijn moment om iets nieuws te starten, als je er zin in hebt." },
     { soort: "Beweging", tekst: "Zin in sporten? Wissel kracht en cardio af. Het bewijs dat een fase bepaalt wat het beste werkt is klein, dus kies wat bij jou past." },
     { soort: "Voeding", tekst: "Eiwit en groenten bij elke maaltijd houden je energie stabiel." },
     { soort: "Huid", tekst: "Smeer het hele jaar zonnebrand (SPF) als je buiten bent." },
