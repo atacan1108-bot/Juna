@@ -26,6 +26,14 @@ function Rij({ set }: { set: string[] }) {
   );
 }
 
+function bronNaam(b: string): string {
+  if (b === "Extra") return "voor je extra";
+  const week = b.split(":")[0];
+  if (week === weekId()) return "deze week";
+  if (week === weekId(weekOver(7))) return "volgende week";
+  return "andere week";
+}
+
 function bewaarMachine(): "mixer" | "slowjuicer" | "beide" {
   try {
     const m = localStorage.getItem("juna.machine.v1");
@@ -116,11 +124,20 @@ export default function Lijstje() {
                     <span className="lj-n">
                       {i.naam}
                       {i.ing ? (() => {
-                        const totaalSapjes = sapjes * Math.max(1, i.bron.length);
-                        const h = hoeveelheid(i.ing, totaalSapjes);
+                        const ing = i.ing;
+                        const delen = i.bron.length;
+                        const totaalSapjes = sapjes * Math.max(1, delen);
+                        const h = hoeveelheid(ing, totaalSapjes);
+                        const hier = hoeveelheid(ing, sapjes).nodig;
+                        const uitleg =
+                          delen > 1
+                            ? ` · ${i.bron.map((b) => `${hier} ${bronNaam(b)}`).join(" + ")}`
+                            : sapjes > 1
+                              ? ` · voor ${sapjes} sapjes`
+                              : "";
                         return (
                           <>
-                            <small>{h.nodig}{totaalSapjes > 1 ? ` · voor ${totaalSapjes} sapjes` : ""}</small>
+                            <small>{h.nodig}{uitleg}</small>
                             {h.koop ? <small>Koop: {h.koop}{h.rest ? `. ${h.rest}` : ""}</small> : null}
                           </>
                         );
@@ -205,9 +222,8 @@ export default function Lijstje() {
         )}
       </section>
 
-      {sapjes > 1 ? (
         <div className="card" style={{ borderRadius: 22, display: "flex", flexDirection: "column", gap: 6 }}>
-          <strong style={{ fontSize: 15 }}>Zo bewaar je je sap</strong>
+          <strong style={{ fontSize: 15 }}>Hoe lang blijft je sap goed?</strong>
           <span style={{ fontSize: 13, lineHeight: 1.45 }}>{BEWAAR[bewaarMachine()]}</span>
           <span style={{ fontSize: 13, lineHeight: 1.45 }}>
             Giet het in schone, afgesloten flessen, zo vol mogelijk, en zet ze achterin de koelkast. Een schijfje citroen of limoen helpt. Schud even voor het drinken.
@@ -217,7 +233,6 @@ export default function Lijstje() {
             Voor jonge kinderen, zwangeren en ouderen is het veiliger om vers sap dezelfde dag te drinken.
           </span>
         </div>
-      ) : null}
       <span style={{ fontSize: 12.5, lineHeight: 1.45, color: "var(--ink-2)" }}>
         Juna houdt rekening met je allergieën en voorkeuren. Zet je meerdere weken op je lijstje, dan telt Juna dezelfde ingrediënten bij elkaar op. Je lijstje blijft alleen op dit toestel.
       </span>

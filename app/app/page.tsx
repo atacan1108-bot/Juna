@@ -10,7 +10,7 @@ import { computeToday, useCycle } from "@/lib/cycle";
 import { getPhase, getRecipe } from "@/lib/data";
 import { tipLink, weekTips } from "@/lib/tips";
 import ExtraBlok from "@/components/ExtraBlok";
-import { receptOk, useVoorkeuren } from "@/lib/voorkeuren";
+import { useVoorkeuren } from "@/lib/voorkeuren";
 
 const fmt = new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long" });
 
@@ -94,22 +94,6 @@ export default function Vandaag() {
           })}
         </div>
         <span style={{ fontSize: 11, opacity: 0.7, lineHeight: 1.4 }}>Elke week nieuwe tips. Juna geeft geen medisch advies.</span>
-      </div>
-
-      <div className="card" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        <span className="eyebrow" style={{ color: "var(--muted)" }}>Ook goed deze fase</span>
-        {phase.recipes.slice(1).filter((slug) => receptOk(getRecipe(slug)!, uitgesloten)).map((slug) => {
-          const r = getRecipe(slug)!;
-          return (
-            <Link key={slug} href={`/app/recept/${slug}`} style={{ display: "flex", gap: 12, alignItems: "center", textDecoration: "none" }}>
-              <span className="dot" style={{ width: 40, height: 40, background: r.colors[0] }} />
-              <span style={{ display: "flex", flexDirection: "column" }}>
-                <strong>{r.name}</strong>
-                <span style={{ fontSize: 13, color: "var(--muted)" }}>{r.short}</span>
-              </span>
-            </Link>
-          );
-        })}
       </div>
     </main>
   );

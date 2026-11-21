@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ING } from "@/lib/ingredients";
-import { kiesExtra, MEEDENK, SHOT_BEREIDING, UITLEG, type ExtraDoel } from "@/lib/extras";
+import { kiesExtra, SHOT_BEREIDING, UITLEG, type ExtraDoel } from "@/lib/extras";
 import { extraStore, zetOpLijst } from "@/lib/mijn";
 
 const NAMEN: Record<ExtraDoel, string> = { huid: "Voor je huid", haar: "Voor je haar" };
@@ -37,7 +37,7 @@ export default function ExtraBlok({ uitgesloten, kleur, tint }: { uitgesloten: s
       </div>
       {doel && keuze ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <span style={{ fontSize: 13.5, lineHeight: 1.45, color: "var(--ink-2)" }}>{UITLEG[doel]} {MEEDENK[doel]}</span>
+          <span style={{ fontSize: 13.5, lineHeight: 1.45, color: "var(--ink-2)" }}>{UITLEG[doel]}</span>
           {keuze.toppings.length ? (
             <div style={{ borderRadius: 18, background: tint, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
               <strong style={{ fontSize: 15, color: kleur }}>Voeg dit toe aan je sapje</strong>

@@ -78,3 +78,10 @@ export const BEWAAR: Record<"mixer" | "slowjuicer" | "beide", string> = {
   slowjuicer: "Sap uit een slowjuicer houdt het best 1 tot 2 dagen in de koelkast, hooguit 3 dagen. Twijfel je? Drink het dan eerder.",
   beide: "Sap uit een slowjuicer houdt het best 1 tot 2 dagen in de koelkast, hooguit 3 dagen. Een smoothie uit de blender drink je dezelfde dag, uiterlijk binnen 24 uur.",
 };
+
+/** korte regel bij het sapje zelf */
+export const HOUDBAAR: Record<"mixer" | "slowjuicer" | "beide", string> = {
+  mixer: "Smoothie uit de blender: drink hem dezelfde dag, uiterlijk binnen 24 uur.",
+  slowjuicer: "Sap uit je slowjuicer (cold press): 1 tot 2 dagen in de koelkast, hooguit 3 dagen.",
+  beide: "Blender: dezelfde dag drinken, uiterlijk binnen 24 uur. Slowjuicer (cold press): 1 tot 2 dagen in de koelkast, hooguit 3 dagen.",
+};

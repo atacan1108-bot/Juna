@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Phase, PhaseId } from "@/lib/data";
 
+import { HOUDBAAR } from "@/lib/porties";
 import { advies, type Machine } from "@/lib/advies";
 import { PHASES } from "@/lib/data";
 import { bewaardStore, isBewaard, markeerGemaakt, vastStore, wisselBewaard, zetOpLijst } from "@/lib/mijn";
@@ -342,6 +343,7 @@ export default function FruitRain({ phase, uitgesloten = [] }: { phase: Phase & 
             </button>
           ))}
         </div>
+        <p className="fr-tip"><strong>Houdbaarheid:</strong> {HOUDBAAR[machine]}</p>
         <span style={{ fontSize: 11, opacity: 0.7, lineHeight: 1.4 }}>Juna geeft geen medisch advies. Heb je klachten of gebruik je medicijnen? Overleg met je huisarts.</span>
       </div>
       {adv.popup && gesloten !== setKey ? (
