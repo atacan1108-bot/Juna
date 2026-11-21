@@ -80,11 +80,11 @@ export default function Home() {
                   </span>
                 </div>
                 <div style={{ borderRadius: 20, background: "#fff", padding: 14, display: "flex", flexDirection: "column", gap: 6 }}>
-                  <span className="eyebrow" style={{ color: "var(--berry-d)" }}>Glow-tip</span>
+                  <span className="eyebrow" style={{ color: "var(--berry-d)" }}>Huid-extra</span>
                   <span style={{ fontSize: 13, lineHeight: 1.4 }}>Je huid kan nu wat vetter zijn. Kies vandaag voor komkommer en munt.</span>
                 </div>
                 <div style={{ borderRadius: 20, background: "var(--green-t)", padding: 14, display: "flex", flexDirection: "column", gap: 6 }}>
-                  <span className="eyebrow" style={{ color: "var(--green-d)" }}>Haar</span>
+                  <span className="eyebrow" style={{ color: "var(--green-d)" }}>Haar-extra</span>
                   <span style={{ fontSize: 13, lineHeight: 1.4 }}>Strooi pompoenpitten over je smoothie voor extra zink.</span>
                 </div>
               </div>
@@ -202,7 +202,7 @@ export default function Home() {
                 Begin gratis. Later: Juna Plus voor alle recepten.
               </h2>
               <p style={{ fontSize: 17, lineHeight: 1.55, color: "#EDE6FA" }}>
-                Gratis: je sap van de week. Plus: alle recepten, glow- en haarroutines, boodschappenlijstjes en
+                Gratis: je sap van de week. Plus: alle recepten, extra's voor huid en haar, boodschappenlijstjes en
                 weekplanning.
               </p>
             </div>
