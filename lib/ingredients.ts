@@ -128,6 +128,9 @@ export const COMBOS: Record<PhaseId, string[][]> = {
   ],
 };
 
+/** Standaardhoeveelheid per ingrediënt, voor het boodschappenlijstje. */
+export const AMT: Record<string, string> = {"beet": "1 middelgrote", "pomegranate": "½ stuk", "orange": "2 stuks", "ginger": "2 cm", "spinach": "1 handje", "kiwi": "2 stuks", "cucumber": "½ stuk", "apple": "1 stuk", "lime": "½ stuk", "carrot": "2 stuks", "pineapple": "2 plakken", "turmeric": "1 cm", "pepper": "snufje", "blueberry": "1 handje", "banana": "2 stuks", "cacao": "1 eetlepel", "celery": "2 stengels", "fennel": "½ knol", "strawberry": "1 handje", "pear": "1 stuk", "avocado": "½ stuk", "mango": "½ stuk", "cherry": "1 handje", "watermelon": "2 plakken", "redpepper": "1 stuk", "parsley": "klein bosje", "lemon": "½ stuk", "raspberry": "1 handje", "mint": "5 blaadjes", "kale": "1 handje", "grape": "1 handje", "papaya": "¼ stuk", "apricot": "3 stuks", "grapefruit": "1 stuk", "tomato": "2 stuks", "pumpkinseed": "1 eetlepel", "almond": "1 handje", "date": "3 stuks", "cinnamon": "snufje", "fig": "2 stuks"};
+
 /* sap-gehalte en bereiding per ingrediënt */
 const SAP: Record<string, [number, "pers" | "mix" | "toevoegen"]> = {
   orange: [3, "pers"], apple: [3, "pers"], pineapple: [3, "pers"], grapefruit: [3, "pers"], lemon: [3, "pers"], lime: [3, "pers"],
@@ -171,12 +174,20 @@ function overlap(a: string[], b: string[]) {
 const zelfde = (a: string[], b: string[]) => a.length === b.length && a.every((x) => b.includes(x));
 
 /** Kiest een combinatie. `vermijd` zijn eerdere sets waar de nieuwe duidelijk van moet verschillen. */
-export function beschikbaar(phase: PhaseId, uitgesloten: string[] = []): string[][] {
-  return COMBOS[phase].filter((c) => !c.some((id) => uitgesloten.includes(id)));
+export function beschikbaar(phase: PhaseId, uitgesloten: string[] = [], vast?: string | null): string[][] {
+  const zonder = COMBOS[phase].filter((c) => !c.some((id) => uitgesloten.includes(id)));
+  if (!vast) return zonder;
+  const met = zonder.filter((c) => c.includes(vast));
+  return met.length ? met : zonder; // past het vastgezette ingrediënt niet in deze fase, dan negeren we het
 }
 
-export function kiesSet(phase: PhaseId, seedText: string, vermijd: string[][] = [], uitgesloten: string[] = []): string[] {
-  const combos = beschikbaar(phase, uitgesloten);
+/** In welke fase komt dit ingrediënt wel voor? (voor het berichtje "komt terug in ...") */
+export function fasesMet(id: string): PhaseId[] {
+  return (Object.keys(COMBOS) as PhaseId[]).filter((p) => COMBOS[p].some((c) => c.includes(id)));
+}
+
+export function kiesSet(phase: PhaseId, seedText: string, vermijd: string[][] = [], uitgesloten: string[] = [], vast?: string | null): string[] {
+  const combos = beschikbaar(phase, uitgesloten, vast);
   if (!combos.length) return [];
   const r = rng(hash(seedText));
   const volgorde = combos.map((c, i) => ({ c, k: r() + i * 0 })).sort((x, y) => x.k - y.k).map((x) => x.c);
@@ -204,12 +215,12 @@ function vorigeWeek(d = new Date()) {
 }
 
 /** De vaste set van deze week: elke week anders, binnen de week hetzelfde. */
-export function weekSet(phase: PhaseId, uitgesloten: string[] = [], d = new Date()): string[] {
+export function weekSet(phase: PhaseId, uitgesloten: string[] = [], vast?: string | null, d = new Date()): string[] {
   const vorige = kiesSet(phase, `${vorigeWeek(d)}:${phase}`, [], uitgesloten);
-  return kiesSet(phase, `${weekId(d)}:${phase}`, [vorige], uitgesloten);
+  return kiesSet(phase, `${weekId(d)}:${phase}`, [vorige], uitgesloten, vast);
 }
 
 /** Een nieuwe set na een tik op "Schud opnieuw". */
-export function schudSet(phase: PhaseId, eerder: string[][], uitgesloten: string[] = []): string[] {
-  return kiesSet(phase, `${Math.random()}:${Date.now()}:${phase}`, eerder.slice(-3), uitgesloten);
+export function schudSet(phase: PhaseId, eerder: string[][], uitgesloten: string[] = [], vast?: string | null): string[] {
+  return kiesSet(phase, `${Math.random()}:${Date.now()}:${phase}`, eerder.slice(-3), uitgesloten, vast);
 }

@@ -7,6 +7,7 @@ import { checkStarts, clearCycle, gemiddelden, loadHistory, saveCycle, saveHisto
 import DatePicker from "@/components/DatePicker";
 import VoorkeurKiezer from "@/components/VoorkeurKiezer";
 import VoorkeurTelling from "@/components/VoorkeurTelling";
+import { wisAlleMijn } from "@/lib/mijn";
 import { clearVoorkeuren, saveVoorkeuren, useVoorkeuren } from "@/lib/voorkeuren";
 
 function isoDaysAgo(n: number) {
@@ -211,6 +212,7 @@ export default function Koppelen() {
           onClick={() => {
             clearCycle();
             clearVoorkeuren();
+            wisAlleMijn();
             router.push("/app/welkom");
           }}
           style={{ background: "none", border: "none", color: "var(--berry-d)", fontWeight: 700, fontSize: 14, minHeight: 44, cursor: "pointer" }}

@@ -2,26 +2,31 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconCycle, IconHome, IconLink, IconSparkle } from "./Icons";
+import { IconBook, IconCart, IconCycle, IconHome, IconSparkle } from "./Icons";
+import { lijstStore } from "@/lib/mijn";
 
 const TABS = [
   { href: "/app", label: "Vandaag", Icon: IconHome },
   { href: "/app/fases", label: "Fases", Icon: IconCycle },
-  { href: "/app/glow", label: "Glow & haar", Icon: IconSparkle },
-  { href: "/app/koppelen", label: "Koppelen", Icon: IconLink },
+  { href: "/app/lijstje", label: "Lijstje", Icon: IconCart },
+  { href: "/app/fruitboek", label: "Fruitboek", Icon: IconBook },
+  { href: "/app/glow", label: "Glow", Icon: IconSparkle },
 ];
 
 export default function TabBar() {
   const path = usePathname();
+  const lijst = lijstStore.useHook();
+  const open = lijst.filter((i) => !i.klaar).length;
   if (path === "/app/welkom") return null;
   return (
     <nav aria-label="Tabbalk" className="tabbar">
       {TABS.map(({ href, label, Icon }) => {
         const active = href === "/app" ? path === "/app" : path.startsWith(href);
         return (
-          <Link key={href} href={href} className="tab" aria-current={active ? "page" : undefined}>
+          <Link key={href} href={href} className="tab" aria-current={active ? "page" : undefined} style={{ position: "relative" }}>
             <Icon />
             {label}
+            {href === "/app/lijstje" && open > 0 ? <b className="tab-badge" aria-label={`${open} nog te halen`}>{open}</b> : null}
           </Link>
         );
       })}
