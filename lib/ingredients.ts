@@ -171,8 +171,13 @@ function overlap(a: string[], b: string[]) {
 const zelfde = (a: string[], b: string[]) => a.length === b.length && a.every((x) => b.includes(x));
 
 /** Kiest een combinatie. `vermijd` zijn eerdere sets waar de nieuwe duidelijk van moet verschillen. */
-export function kiesSet(phase: PhaseId, seedText: string, vermijd: string[][] = []): string[] {
-  const combos = COMBOS[phase];
+export function beschikbaar(phase: PhaseId, uitgesloten: string[] = []): string[][] {
+  return COMBOS[phase].filter((c) => !c.some((id) => uitgesloten.includes(id)));
+}
+
+export function kiesSet(phase: PhaseId, seedText: string, vermijd: string[][] = [], uitgesloten: string[] = []): string[] {
+  const combos = beschikbaar(phase, uitgesloten);
+  if (!combos.length) return [];
   const r = rng(hash(seedText));
   const volgorde = combos.map((c, i) => ({ c, k: r() + i * 0 })).sort((x, y) => x.k - y.k).map((x) => x.c);
   const laatste = vermijd[vermijd.length - 1];
@@ -199,12 +204,12 @@ function vorigeWeek(d = new Date()) {
 }
 
 /** De vaste set van deze week: elke week anders, binnen de week hetzelfde. */
-export function weekSet(phase: PhaseId, d = new Date()): string[] {
-  const vorige = kiesSet(phase, `${vorigeWeek(d)}:${phase}`);
-  return kiesSet(phase, `${weekId(d)}:${phase}`, [vorige]);
+export function weekSet(phase: PhaseId, uitgesloten: string[] = [], d = new Date()): string[] {
+  const vorige = kiesSet(phase, `${vorigeWeek(d)}:${phase}`, [], uitgesloten);
+  return kiesSet(phase, `${weekId(d)}:${phase}`, [vorige], uitgesloten);
 }
 
 /** Een nieuwe set na een tik op "Schud opnieuw". */
-export function schudSet(phase: PhaseId, eerder: string[][]): string[] {
-  return kiesSet(phase, `${Math.random()}:${Date.now()}:${phase}`, eerder.slice(-3));
+export function schudSet(phase: PhaseId, eerder: string[][], uitgesloten: string[] = []): string[] {
+  return kiesSet(phase, `${Math.random()}:${Date.now()}:${phase}`, eerder.slice(-3), uitgesloten);
 }

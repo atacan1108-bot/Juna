@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useState } from "react";
 import type { Phase, PhaseId } from "@/lib/data";
 
@@ -84,30 +86,31 @@ function shouldPlay(phase: PhaseId): boolean {
   }
 }
 
-function loadSets(phase: PhaseId): string[][] {
+function loadSets(phase: PhaseId, uitgesloten: string[]): string[][] {
   try {
     const raw = localStorage.getItem(SET_KEY);
     if (raw) {
       const v = JSON.parse(raw) as Saved;
-      const geldig = Array.isArray(v.sets) && v.sets.length > 0 && v.sets.every((st) => Array.isArray(st) && st.length === 4 && st.every((id) => ING[id]));
+      const geldig = Array.isArray(v.sets) && v.sets.length > 0 && v.sets.every((st) => Array.isArray(st) && st.length === 4 && st.every((id) => ING[id] && !uitgesloten.includes(id)));
       if (v.week === weekId() && v.phase === phase && geldig) return v.sets;
     }
   } catch {
     /* ignore */
   }
-  return [weekSet(phase)];
+  const nieuw = weekSet(phase, uitgesloten);
+  return nieuw.length ? [nieuw] : [];
 }
 
-export default function FruitRain({ phase }: { phase: Phase & { recipeName: string } }) {
+export default function FruitRain({ phase, uitgesloten = [] }: { phase: Phase & { recipeName: string }; uitgesloten?: string[] }) {
   // Deze component wordt pas getoond nadat de pagina in de browser geladen is.
   const phaseId = phase.id;
   const [animate, setAnimate] = useState<boolean>(() => shouldPlay(phaseId));
   const [run, setRun] = useState(0);
-  const [sets, setSets] = useState<string[][]>(() => loadSets(phaseId));
+  const [sets, setSets] = useState<string[][]>(() => loadSets(phaseId, uitgesloten));
   const [machine, setMachine] = useState<Machine>(() => loadMachine());
   const [gesloten, setGesloten] = useState<string>("");
-  const current = sets[sets.length - 1];
-  const adv = advies(current, machine);
+  const current = sets[sets.length - 1] ?? [];
+  const adv = advies(current, machine, uitgesloten);
   const setKey = `${machine}:${current.join(",")}`;
   const kiesMachine = (m: Machine) => {
     setMachine(m);
@@ -118,7 +121,7 @@ export default function FruitRain({ phase }: { phase: Phase & { recipeName: stri
     }
   };
   const ings = current.map((id) => ING[id]);
-  const { items, shadows, left, right } = build(ings);
+  const { items, shadows, left, right } = current.length ? build(ings) : { items: [], shadows: [], left: [], right: [] };
 
   useEffect(() => {
     try {
@@ -149,7 +152,10 @@ export default function FruitRain({ phase }: { phase: Phase & { recipeName: stri
   };
 
   const replay = () => opnieuw();
-  const shuffle = () => opnieuw(() => setSets((prev) => [...prev, schudSet(phaseId, prev)]));
+  const shuffle = () => opnieuw(() => setSets((prev) => {
+    const nieuw = schudSet(phaseId, prev, uitgesloten);
+    return nieuw.length ? [...prev, nieuw] : prev;
+  }));
 
   const box = (p: Piece) => ({
     left: cq(p.left),
@@ -157,6 +163,18 @@ export default function FruitRain({ phase }: { phase: Phase & { recipeName: stri
     width: cq(p.size),
     height: cq(p.size),
   });
+
+  if (!current.length) {
+    return (
+      <div className="fr-info" style={{ padding: 8 }}>
+        <span className="display" style={{ fontSize: 24, color: phase.dark }}>{phase.recipeName}</span>
+        <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
+          Met jouw allergieën en voorkeuren heeft Juna voor deze fase geen sapje meer. Pas je lijst aan, dan zoekt Juna opnieuw.
+        </p>
+        <Link href="/app/voorkeuren" style={{ color: phase.dark, fontWeight: 700, fontSize: 14 }}>Voorkeuren aanpassen</Link>
+      </div>
+    );
+  }
 
   return (
     <>

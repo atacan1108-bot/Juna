@@ -6,13 +6,15 @@ import { Suspense, useState } from "react";
 import { IconSparkle, IconWave } from "@/components/Icons";
 import { computeToday, useCycle } from "@/lib/cycle";
 import { RECIPES, getPhase } from "@/lib/data";
+import { receptOk, useVoorkeuren } from "@/lib/voorkeuren";
 
 function GlowInner() {
   const params = useSearchParams();
   const [goal, setGoal] = useState<"glow" | "haar">(params.get("doel") === "haar" ? "haar" : "glow");
   const cycle = useCycle();
   const phase = cycle ? getPhase(computeToday(cycle).phase) : null;
-  const list = RECIPES.filter((r) => r.category === goal);
+  const { uitgesloten } = useVoorkeuren();
+  const list = RECIPES.filter((r) => r.category === goal && receptOk(r, uitgesloten));
   const isGlow = goal === "glow";
 
   return (

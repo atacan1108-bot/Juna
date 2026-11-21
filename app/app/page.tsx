@@ -9,12 +9,14 @@ import { IconSparkle, IconWave } from "@/components/Icons";
 import { computeToday, useCycle } from "@/lib/cycle";
 import { getPhase, getRecipe } from "@/lib/data";
 import { tipLink, weekTips } from "@/lib/tips";
+import { receptOk, useVoorkeuren } from "@/lib/voorkeuren";
 
 const fmt = new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long" });
 
 export default function Vandaag() {
   const cycle = useCycle();
   const router = useRouter();
+  const { uitgesloten } = useVoorkeuren();
 
   useEffect(() => {
     if (cycle === null) router.replace("/app/welkom");
@@ -57,19 +59,20 @@ export default function Vandaag() {
               ? `Dag ${day} van je menstruatie`
               : `Menstruatie over ± ${daysToPeriod} ${daysToPeriod === 1 ? "dag" : "dagen"}`}
           </span>
+          {cycle.irregular ? <span style={{ fontSize: 12, color: "var(--muted)" }}>Je cyclus varieert, dus dit is een inschatting.</span> : null}
         </div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <h2 style={{ fontWeight: 700, fontSize: 20 }}>Jouw {recipe.kind === "smoothie" ? "smoothie" : "sap"} van deze week</h2>
         <div className="fr-card" style={{ background: phase.tint, color: "#2E1428" }}>
-          <FruitRain phase={{ ...phase, recipeName: recipe.name }} />
+          <FruitRain key={uitgesloten.join(",")} phase={{ ...phase, recipeName: recipe.name }} uitgesloten={uitgesloten} />
         </div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10 }}>
-          {weekTips(phaseId).map((tip, i) => {
+          {weekTips(phaseId, uitgesloten).map((tip, i) => {
             const link = tipLink(tip);
             const kleur = i === 0 ? "var(--orange-d)" : "var(--green-d)";
             const stijl = { textDecoration: "none", color: "inherit", background: i === 0 ? "var(--orange-t)" : "var(--green-t)", borderRadius: 22, padding: 14, display: "flex", flexDirection: "column" as const, gap: 6 };
@@ -92,7 +95,7 @@ export default function Vandaag() {
 
       <div className="card" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <span className="eyebrow" style={{ color: "var(--muted)" }}>Ook goed deze fase</span>
-        {phase.recipes.slice(1).map((slug) => {
+        {phase.recipes.slice(1).filter((slug) => receptOk(getRecipe(slug)!, uitgesloten)).map((slug) => {
           const r = getRecipe(slug)!;
           return (
             <Link key={slug} href={`/app/recept/${slug}`} style={{ display: "flex", gap: 12, alignItems: "center", textDecoration: "none" }}>

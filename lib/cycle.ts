@@ -7,7 +7,11 @@ export type CycleSettings = {
   lastPeriodStart: string; // YYYY-MM-DD
   cycleLength: number;
   periodLength: number;
+  /** true als de berekende cycli meer dan 7 dagen uit elkaar liggen */
+  irregular?: boolean;
 };
+
+export type CycleEntry = { start: string; periodLength?: number };
 
 const KEY = "juna.cycle.v1";
 const EVT = "juna-cycle-change";
@@ -33,8 +37,60 @@ export function saveCycle(s: CycleSettings) {
   }
 }
 
+const HKEY = "juna.cycle.history.v1";
+
+export function loadHistory(): CycleEntry[] {
+  try {
+    const raw = localStorage.getItem(HKEY);
+    const v = raw ? (JSON.parse(raw) as CycleEntry[]) : [];
+    return Array.isArray(v) ? v.filter((e) => e && typeof e.start === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveHistory(entries: CycleEntry[]) {
+  try {
+    localStorage.setItem(HKEY, JSON.stringify(entries));
+  } catch {
+    /* opslag niet beschikbaar */
+  }
+}
+
+const dagen = (a: string, b: string) => Math.round((new Date(a + "T00:00:00").getTime() - new Date(b + "T00:00:00").getTime()) / 86400000);
+
+/** Controleert een lijst starts (nieuwste eerst). Geeft een melding of een lege tekst. */
+export function checkStarts(startsNieuwsteEerst: string[], vandaag: string): string {
+  if (startsNieuwsteEerst.some((s) => !s)) return "Vul bij elke maand een datum in, of haal de rij weg.";
+  if (startsNieuwsteEerst.some((s) => s > vandaag)) return "Een datum ligt in de toekomst.";
+  for (let i = 0; i < startsNieuwsteEerst.length - 1; i++) {
+    const d = dagen(startsNieuwsteEerst[i], startsNieuwsteEerst[i + 1]);
+    if (d === 0) return "Je hebt twee keer dezelfde datum ingevuld.";
+    if (d < 15) return "Twee menstruaties liggen minder dan 15 dagen uit elkaar. Controleer de datums.";
+  }
+  return "";
+}
+
+/** Rekent gemiddelden uit. Gaten van meer dan 45 dagen (een overgeslagen maand) tellen niet mee. */
+export function gemiddelden(startsNieuwsteEerst: string[], periodes: (number | undefined)[]) {
+  const lengtes: number[] = [];
+  for (let i = 0; i < startsNieuwsteEerst.length - 1; i++) {
+    const d = dagen(startsNieuwsteEerst[i], startsNieuwsteEerst[i + 1]);
+    if (d >= 21 && d <= 45) lengtes.push(d);
+  }
+  const p = periodes.filter((x): x is number => typeof x === "number" && x >= 2 && x <= 8);
+  const gem = (a: number[]) => Math.round(a.reduce((x, y) => x + y, 0) / a.length);
+  return {
+    aantal: lengtes.length,
+    cycleLength: lengtes.length ? gem(lengtes) : undefined,
+    periodLength: p.length ? gem(p) : undefined,
+    irregular: lengtes.length >= 2 && Math.max(...lengtes) - Math.min(...lengtes) > 7,
+  };
+}
+
 export function clearCycle() {
   try {
+    localStorage.removeItem(HKEY);
     localStorage.removeItem(KEY);
     window.dispatchEvent(new Event(EVT));
   } catch {
