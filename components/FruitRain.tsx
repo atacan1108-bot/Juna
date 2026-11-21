@@ -15,7 +15,7 @@ const W = 390; // breedte van het ontwerp in px; alles hieronder schaalt mee via
 const cq = (px: number) => `${((px / W) * 100).toFixed(3)}cqw`;
 const frac = (x: number) => x - Math.floor(x);
 
-type Piece = { left: number; top: number; size: number; rot: number; delay: number; dur: number; src: string };
+type Piece = { left: number; top: number; size: number; rot: number; delay: number; dur: number; src: string; ing: string };
 
 function build(ings: Ingredient[]) {
   const stack = ings.filter((i) => !i.klein);
@@ -34,7 +34,7 @@ function build(ings: Ingredient[]) {
       const left = Math.round(195 + (j - (count - 1) / 2) * 56 - size / 2);
       const delay = 0.1 + r * 0.5 + j * 0.12 + frac(s * 0.31) * 0.08;
       const file = ing.snede && (j + r) % 2 === 1 ? ing.snede : ing.id;
-      items.push({ left, top, size, rot: ((s * 37) % 13) - 6, delay, dur: 1.5, src: `/fruit/${file}.svg` });
+      items.push({ left, top, size, rot: ((s * 37) % 13) - 6, delay, dur: 1.5, src: `/fruit/${file}.svg`, ing: ing.id });
       if (r === 0) shadows.push({ left: left + 4, w: size - 8, delay });
       s++;
     }
@@ -43,7 +43,7 @@ function build(ings: Ingredient[]) {
   const kL = round[0] ?? stack[0];
   const kR = round[1] ?? round[0] ?? stack[0];
   const mk = (id: string, left: number, size: number, delay: number, dur: number): Piece => ({
-    left, top: Math.round(440 - size * 0.92), size, rot: 0, delay, dur, src: `/fruit/${id}.svg`,
+    left, top: Math.round(440 - size * 0.92), size, rot: 0, delay, dur, src: `/fruit/${id}.svg`, ing: id,
   });
   const left = [mk(kL.id, 6, 44, 1.0, 2.6)];
   const right = [mk(kR.id, 340, 44, 1.25, 2.6)];
@@ -76,6 +76,53 @@ function reduced() {
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   } catch {
     return false;
+  }
+}
+
+// Nieuw fruit vliegt naar het icoontje van het fruitboek.
+function vliegNaarBoek(ids: string[], vanKnop: HTMLElement | null) {
+  try {
+    if (reduced() || !ids.length) return;
+    const doel = document.querySelector<HTMLElement>('[data-tab="fruitboek"]');
+    if (!doel) return;
+    const d = doel.getBoundingClientRect();
+    const dx = d.left + d.width / 2;
+    const dy = d.top + d.height / 2 - 8;
+    const knop = vanKnop?.getBoundingClientRect();
+    let n = 0;
+    ids.forEach((id) => {
+      const els = Array.from(document.querySelectorAll<HTMLElement>(`.fruit-stage [data-ing="${id}"]`)).filter((e) => !e.classList.contains("fr-roll-l") && !e.classList.contains("fr-roll-r"));
+      const el = els[0];
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const zichtbaar = r.bottom > 0 && r.top < window.innerHeight;
+      const sx = zichtbaar ? r.left + r.width / 2 : knop ? knop.left + knop.width / 2 : window.innerWidth / 2;
+      const sy = zichtbaar ? r.top + r.height / 2 : knop ? knop.top : window.innerHeight / 2;
+      const size = zichtbaar ? Math.max(40, r.width) : 56;
+      const img = document.createElement("img");
+      img.src = `/fruit/${id}.svg`;
+      img.alt = "";
+      img.setAttribute("aria-hidden", "true");
+      img.style.cssText = `position:fixed;z-index:60;left:${sx - size / 2}px;top:${sy - size / 2}px;width:${size}px;height:${size}px;pointer-events:none;will-change:transform`;
+      document.body.appendChild(img);
+      if (zichtbaar) els.forEach((e) => (e.style.visibility = "hidden"));
+      const delay = n * 160;
+      n++;
+      const a = img.animate(
+        [
+          { transform: "translate(0,0) scale(1)", opacity: 1, offset: 0 },
+          { transform: `translate(${(dx - sx) * 0.25}px,${(dy - sy) * 0.25 - 50}px) scale(1.15)`, opacity: 1, offset: 0.3 },
+          { transform: `translate(${dx - sx}px,${dy - sy}px) scale(0.28)`, opacity: 0.25, offset: 1 },
+        ],
+        { duration: 850, delay, easing: "cubic-bezier(.5,0,.7,.4)", fill: "both" },
+      );
+      a.onfinish = () => {
+        img.remove();
+        doel.animate([{ transform: "scale(1)" }, { transform: "scale(1.3) rotate(-8deg)" }, { transform: "scale(1)" }], { duration: 350 });
+      };
+    });
+  } catch {
+    /* animatie is extra */
   }
 }
 
@@ -192,19 +239,19 @@ export default function FruitRain({ phase, uitgesloten = [] }: { phase: Phase & 
           />
         ))}
         {leeg ? null : items.map((p, i) => (
-          <span key={i} className={animate ? "fr-fruit fr-anim" : "fr-fruit"} style={{ ...box(p), animationDelay: `${p.delay.toFixed(2)}s` }}>
+          <span key={i} data-ing={p.ing} className={animate ? "fr-fruit fr-anim" : "fr-fruit"} style={{ ...box(p), animationDelay: `${p.delay.toFixed(2)}s` }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={p.src} alt="" draggable={false} style={{ transform: `rotate(${p.rot}deg)` }} />
           </span>
         ))}
         {leeg ? null : left.map((p, i) => (
-          <span key={`l${i}`} className={animate ? "fr-roll-l fr-anim" : "fr-gone"} style={{ ...box(p), animationDelay: `${p.delay.toFixed(2)}s`, animationDuration: `${p.dur}s` }}>
+          <span key={`l${i}`} data-ing={p.ing} className={animate ? "fr-roll-l fr-anim" : "fr-gone"} style={{ ...box(p), animationDelay: `${p.delay.toFixed(2)}s`, animationDuration: `${p.dur}s` }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={p.src} alt="" draggable={false} />
           </span>
         ))}
         {leeg ? null : right.map((p, i) => (
-          <span key={`r${i}`} className={animate ? "fr-roll-r fr-anim" : "fr-gone"} style={{ ...box(p), animationDelay: `${p.delay.toFixed(2)}s`, animationDuration: `${p.dur}s` }}>
+          <span key={`r${i}`} data-ing={p.ing} className={animate ? "fr-roll-r fr-anim" : "fr-gone"} style={{ ...box(p), animationDelay: `${p.delay.toFixed(2)}s`, animationDuration: `${p.dur}s` }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={p.src} alt="" draggable={false} />
           </span>
@@ -260,8 +307,9 @@ export default function FruitRain({ phase, uitgesloten = [] }: { phase: Phase & 
             type="button"
             className="fr-gemaakt"
             style={{ background: phase.dark }}
-            onClick={() => {
+            onClick={(e) => {
               const r = markeerGemaakt(current);
+              vliegNaarBoek(r.nieuweIds, e.currentTarget);
               setStatus(r.alVandaag ? "Dit sapje heb je vandaag al afgevinkt." : r.nieuw ? `Mooi! ${r.nieuw} ${r.nieuw === 1 ? "nieuw fruit" : "nieuwe"} in je fruitboek.` : "Alles hiervan stond al in je fruitboek.");
             }}
           >

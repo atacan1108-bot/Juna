@@ -24,7 +24,7 @@ export default function TabBar() {
         const active = href === "/app" ? path === "/app" : path.startsWith(href);
         return (
           <Link key={href} href={href} className="tab" aria-current={active ? "page" : undefined} style={{ position: "relative" }}>
-            <Icon />
+            <span data-tab={href === "/app/fruitboek" ? "fruitboek" : undefined} style={{ display: "inline-flex" }}><Icon /></span>
             {label}
             {href === "/app/lijstje" && open > 0 ? <b className="tab-badge" aria-label={`${open} nog te halen`}>{open}</b> : null}
           </Link>

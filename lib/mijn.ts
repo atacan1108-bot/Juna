@@ -89,7 +89,7 @@ export function dagISO(d = new Date()) {
 
 /* ---- "Ik heb dit gemaakt": alleen dan komt fruit in het fruitboek ---- */
 const GEMAAKT_KEY = "juna.gemaakt.v1";
-export function markeerGemaakt(set: string[]): { nieuw: number; alVandaag: boolean } {
+export function markeerGemaakt(set: string[]): { nieuw: number; nieuweIds: string[]; alVandaag: boolean } {
   const vandaag = dagISO();
   let gedaan: string[] = [];
   try {
@@ -98,7 +98,7 @@ export function markeerGemaakt(set: string[]): { nieuw: number; alVandaag: boole
   } catch {
     /* ignore */
   }
-  if (gedaan.includes(sleutel(set))) return { nieuw: 0, alVandaag: true };
+  if (gedaan.includes(sleutel(set))) return { nieuw: 0, nieuweIds: [], alVandaag: true };
   try {
     localStorage.setItem(GEMAAKT_KEY, JSON.stringify({ dag: vandaag, sets: [...gedaan, sleutel(set)] }));
   } catch {
@@ -107,7 +107,7 @@ export function markeerGemaakt(set: string[]): { nieuw: number; alVandaag: boole
   const boek = boekStore.laad();
   const nieuw = set.filter((id) => !boek.includes(id));
   if (nieuw.length) boekStore.bewaar([...boek, ...nieuw]);
-  return { nieuw: nieuw.length, alVandaag: false };
+  return { nieuw: nieuw.length, nieuweIds: nieuw, alVandaag: false };
 }
 
 /* ---- boodschappenlijstje ---- */
