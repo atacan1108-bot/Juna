@@ -1,0 +1,199 @@
+"use client";
+
+import { useMemo, useSyncExternalStore } from "react";
+import type { PhaseId } from "./data";
+import { ING, schudSet, weekId, weekSet } from "./ingredients";
+
+/* Alles hier blijft op het apparaat van de gebruiker (localStorage). */
+
+function maak<T>(key: string, leeg: T, schoon: (v: unknown) => T) {
+  const evt = `juna-store-${key}`;
+  const lees = (): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  };
+  const subscribe = (cb: () => void) => {
+    window.addEventListener("storage", cb);
+    window.addEventListener(evt, cb);
+    return () => {
+      window.removeEventListener("storage", cb);
+      window.removeEventListener(evt, cb);
+    };
+  };
+  const parse = (raw: string | null): T => {
+    try {
+      return raw ? schoon(JSON.parse(raw)) : leeg;
+    } catch {
+      return leeg;
+    }
+  };
+  return {
+    laad: () => parse(lees()),
+    bewaar: (v: T) => {
+      try {
+        localStorage.setItem(key, JSON.stringify(v));
+        window.dispatchEvent(new Event(evt));
+      } catch {
+        /* opslag niet beschikbaar */
+      }
+    },
+    wis: () => {
+      try {
+        localStorage.removeItem(key);
+        window.dispatchEvent(new Event(evt));
+      } catch {
+        /* ignore */
+      }
+    },
+    useHook: (): T => {
+      const raw = useSyncExternalStore<string | null>(subscribe, lees, () => null);
+      return useMemo(() => parse(raw), [raw]);
+    },
+  };
+}
+
+const ids = (v: unknown): string[] => (Array.isArray(v) ? Array.from(new Set(v.filter((x): x is string => typeof x === "string" && !!ING[x]))) : []);
+
+/* ---- vastgezet ingrediënt (maximaal één) ---- */
+const LEEG_VAST: string | null = null;
+export const vastStore = maak<string | null>("juna.vast.v1", LEEG_VAST, (v) => (typeof v === "string" && ING[v] ? v : null));
+
+/* ---- fruitboek ---- */
+const LEEG_BOEK: string[] = [];
+export const boekStore = maak<string[]>("juna.boek.v1", LEEG_BOEK, ids);
+
+/* ---- bewaarde sapjes ---- */
+export type Bewaard = { phase: PhaseId; ids: string[]; datum: string };
+const LEEG_BEWAARD: Bewaard[] = [];
+export const bewaardStore = maak<Bewaard[]>("juna.bewaard.v1", LEEG_BEWAARD, (v) =>
+  Array.isArray(v)
+    ? (v as Bewaard[])
+        .filter((b) => b && typeof b.datum === "string" && typeof b.phase === "string" && Array.isArray(b.ids) && b.ids.length === 4 && b.ids.every((x) => ING[x]))
+        .slice(-50)
+    : [],
+);
+const sleutel = (a: string[]) => [...a].sort().join(",");
+export const isBewaard = (lijst: Bewaard[], set: string[]) => lijst.some((b) => sleutel(b.ids) === sleutel(set));
+export function wisselBewaard(phase: PhaseId, set: string[]) {
+  const lijst = bewaardStore.laad();
+  if (isBewaard(lijst, set)) bewaardStore.bewaar(lijst.filter((b) => sleutel(b.ids) !== sleutel(set)));
+  else bewaardStore.bewaar([...lijst, { phase, ids: set, datum: dagISO() }]);
+}
+
+export function dagISO(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/* ---- "Ik heb dit gemaakt": alleen dan komt fruit in het fruitboek ---- */
+const GEMAAKT_KEY = "juna.gemaakt.v1";
+export function markeerGemaakt(set: string[]): { nieuw: number; alVandaag: boolean } {
+  const vandaag = dagISO();
+  let gedaan: string[] = [];
+  try {
+    const raw = JSON.parse(localStorage.getItem(GEMAAKT_KEY) ?? "null") as { dag: string; sets: string[] } | null;
+    if (raw && raw.dag === vandaag && Array.isArray(raw.sets)) gedaan = raw.sets;
+  } catch {
+    /* ignore */
+  }
+  if (gedaan.includes(sleutel(set))) return { nieuw: 0, alVandaag: true };
+  try {
+    localStorage.setItem(GEMAAKT_KEY, JSON.stringify({ dag: vandaag, sets: [...gedaan, sleutel(set)] }));
+  } catch {
+    /* ignore */
+  }
+  const boek = boekStore.laad();
+  const nieuw = set.filter((id) => !boek.includes(id));
+  if (nieuw.length) boekStore.bewaar([...boek, ...nieuw]);
+  return { nieuw: nieuw.length, alVandaag: false };
+}
+
+/* ---- boodschappenlijstje ---- */
+export type LijstItem = { ing?: string; naam: string; bron: string[]; klaar: boolean };
+const LEEG_LIJST: LijstItem[] = [];
+export const lijstStore = maak<LijstItem[]>("juna.lijst.v1", LEEG_LIJST, (v) =>
+  Array.isArray(v)
+    ? (v as LijstItem[])
+        .filter((i) => i && typeof i.naam === "string" && Array.isArray(i.bron))
+        .map((i) => ({ ing: i.ing && ING[i.ing] ? i.ing : undefined, naam: i.naam.slice(0, 60), bron: i.bron.filter((b) => typeof b === "string"), klaar: !!i.klaar }))
+        .slice(0, 200)
+    : [],
+);
+
+/** Zet de ingrediënten van een sapje op het lijstje. Dezelfde ingrediënten uit een andere week tellen mee als "× 2". */
+export function zetOpLijst(set: string[], bronLabel: string): number {
+  const lijst = lijstStore.laad().map((i) => ({ ...i }));
+  let nieuw = 0;
+  for (const id of set) {
+    const bestaand = lijst.find((i) => i.ing === id);
+    if (bestaand) {
+      if (!bestaand.bron.includes(bronLabel)) {
+        bestaand.bron.push(bronLabel);
+        bestaand.klaar = false;
+        nieuw++;
+      }
+    } else {
+      lijst.push({ ing: id, naam: ING[id].naam, bron: [bronLabel], klaar: false });
+      nieuw++;
+    }
+  }
+  lijstStore.bewaar(lijst);
+  return nieuw;
+}
+
+/* ---- gekozen set voor volgende week ---- */
+export type VolgendeWeek = { week: string; phase: PhaseId; ids: string[] };
+export const volgendeStore = maak<VolgendeWeek | null>("juna.volgende.v1", null, (v) => {
+  const x = v as VolgendeWeek | null;
+  return x && typeof x.week === "string" && typeof x.phase === "string" && Array.isArray(x.ids) && x.ids.length === 4 && x.ids.every((i) => ING[i]) ? x : null;
+});
+
+export function weekOver(dagen: number) {
+  const d = new Date();
+  d.setDate(d.getDate() + dagen);
+  return d;
+}
+
+/** De set voor volgende week: een zelf gekozen set als die er is, anders de vaste keuze van Juna. */
+export function volgendeSet(phase: PhaseId, uitgesloten: string[], vast: string | null, opgeslagen: VolgendeWeek | null): string[] {
+  const d = weekOver(7);
+  if (opgeslagen && opgeslagen.week === weekId(d) && opgeslagen.phase === phase && !opgeslagen.ids.some((i) => uitgesloten.includes(i))) return opgeslagen.ids;
+  return weekSet(phase, uitgesloten, vast, d);
+}
+
+export function schudVolgende(phase: PhaseId, huidig: string[], uitgesloten: string[], vast: string | null) {
+  const nieuw = schudSet(phase, [huidig], uitgesloten, vast);
+  if (nieuw.length) volgendeStore.bewaar({ week: weekId(weekOver(7)), phase, ids: nieuw });
+}
+
+/* ---- de set van deze week, zoals Vandaag die toont ---- */
+export function dezeSet(phase: PhaseId, uitgesloten: string[], vast: string | null): string[] {
+  try {
+    const raw = localStorage.getItem("juna.fruit.set.v1");
+    if (raw) {
+      const v = JSON.parse(raw) as { week: string; phase: PhaseId; sets: string[][] };
+      const laatste = Array.isArray(v.sets) ? v.sets[v.sets.length - 1] : null;
+      if (v.week === weekId() && v.phase === phase && laatste && laatste.length === 4 && laatste.every((i) => ING[i] && !uitgesloten.includes(i))) return laatste;
+    }
+  } catch {
+    /* ignore */
+  }
+  return weekSet(phase, uitgesloten, vast);
+}
+
+export function wisAlleMijn() {
+  vastStore.wis();
+  boekStore.wis();
+  bewaardStore.wis();
+  lijstStore.wis();
+  volgendeStore.wis();
+  try {
+    localStorage.removeItem(GEMAAKT_KEY);
+    localStorage.removeItem("juna.fruit.set.v1");
+    localStorage.removeItem("juna.fruit.week");
+  } catch {
+    /* ignore */
+  }
+}

@@ -6,7 +6,9 @@ import { useEffect, useState } from "react";
 import type { Phase, PhaseId } from "@/lib/data";
 
 import { advies, type Machine } from "@/lib/advies";
-import { ING, schudSet, weekId, weekSet, type Ingredient } from "@/lib/ingredients";
+import { PHASES } from "@/lib/data";
+import { bewaardStore, isBewaard, markeerGemaakt, vastStore, wisselBewaard, zetOpLijst } from "@/lib/mijn";
+import { ING, fasesMet, schudSet, weekId, weekSet, type Ingredient } from "@/lib/ingredients";
 
 const OFFSET = 90; // de lege ruimte boven de stapel halen we weg
 const W = 390; // breedte van het ontwerp in px; alles hieronder schaalt mee via cqw
@@ -86,7 +88,7 @@ function shouldPlay(phase: PhaseId): boolean {
   }
 }
 
-function loadSets(phase: PhaseId, uitgesloten: string[]): string[][] {
+function loadSets(phase: PhaseId, uitgesloten: string[], vast: string | null): string[][] {
   try {
     const raw = localStorage.getItem(SET_KEY);
     if (raw) {
@@ -97,7 +99,7 @@ function loadSets(phase: PhaseId, uitgesloten: string[]): string[][] {
   } catch {
     /* ignore */
   }
-  const nieuw = weekSet(phase, uitgesloten);
+  const nieuw = weekSet(phase, uitgesloten, vast);
   return nieuw.length ? [nieuw] : [];
 }
 
@@ -106,7 +108,10 @@ export default function FruitRain({ phase, uitgesloten = [] }: { phase: Phase & 
   const phaseId = phase.id;
   const [animate, setAnimate] = useState<boolean>(() => shouldPlay(phaseId));
   const [run, setRun] = useState(0);
-  const [sets, setSets] = useState<string[][]>(() => loadSets(phaseId, uitgesloten));
+  const [sets, setSets] = useState<string[][]>(() => loadSets(phaseId, uitgesloten, vastStore.laad()));
+  const vast = vastStore.useHook();
+  const bewaardLijst = bewaardStore.useHook();
+  const [status, setStatus] = useState("");
   const [machine, setMachine] = useState<Machine>(() => loadMachine());
   const [gesloten, setGesloten] = useState<string>("");
   const current = sets[sets.length - 1] ?? [];
@@ -153,7 +158,7 @@ export default function FruitRain({ phase, uitgesloten = [] }: { phase: Phase & 
 
   const replay = () => opnieuw();
   const shuffle = () => opnieuw(() => setSets((prev) => {
-    const nieuw = schudSet(phaseId, prev, uitgesloten);
+    const nieuw = schudSet(phaseId, prev, uitgesloten, vast);
     return nieuw.length ? [...prev, nieuw] : prev;
   }));
 
@@ -225,9 +230,61 @@ export default function FruitRain({ phase, uitgesloten = [] }: { phase: Phase & 
                 <span style={{ fontSize: 13, lineHeight: 1.4 }}>{i.reden}</span>
                 {i.waarschuwing ? <span style={{ fontSize: 12, lineHeight: 1.35, color: phase.dark, fontStyle: "italic" }}>{i.waarschuwing}</span> : null}
               </span>
+              <button
+                type="button"
+                className="fr-slot"
+                aria-pressed={vast === i.id}
+                aria-label={vast === i.id ? `Maak ${i.naam} los` : `Zet ${i.naam} vast`}
+                onClick={() => {
+                  vastStore.bewaar(vast === i.id ? null : i.id);
+                  setStatus(vast === i.id ? `${i.naam} is los. Bij schudden kan alles wisselen.` : `${i.naam} blijft staan als je schudt.`);
+                }}
+                style={vast === i.id ? { background: phase.dark, color: "#fff" } : undefined}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="5" y="11" width="14" height="9" rx="2" />
+                  <path d={vast === i.id ? "M8 11V8a4 4 0 0 1 8 0v3" : "M8 11V8a4 4 0 0 1 7.5-2"} />
+                </svg>
+              </button>
             </li>
           ))}
         </ul>
+        {vast && !fasesMet(vast).includes(phaseId) ? (
+          <p className="fr-tip">
+            {ING[vast].naam} staat vast, maar past niet in deze fase. Hij komt terug in{" "}
+            {fasesMet(vast).map((f) => PHASES.find((p) => p.id === f)?.label.toLowerCase()).join(" en ")}.
+          </p>
+        ) : null}
+        <div className="fr-acties">
+          <button
+            type="button"
+            className="fr-gemaakt"
+            style={{ background: phase.dark }}
+            onClick={() => {
+              const r = markeerGemaakt(current);
+              setStatus(r.alVandaag ? "Dit sapje heb je vandaag al afgevinkt." : r.nieuw ? `Mooi! ${r.nieuw} ${r.nieuw === 1 ? "nieuw fruit" : "nieuwe"} in je fruitboek.` : "Alles hiervan stond al in je fruitboek.");
+            }}
+          >
+            Ik heb dit gemaakt
+          </button>
+          <div className="fr-acties2">
+            <button type="button" onClick={() => setStatus(`${zetOpLijst(current, `${weekId()}:${phaseId}`) ? "Op je boodschappenlijstje gezet." : "Stond al op je lijstje."}`)}>
+              Zet op lijstje
+            </button>
+            <button
+              type="button"
+              aria-pressed={isBewaard(bewaardLijst, current)}
+              onClick={() => {
+                const was = isBewaard(bewaardLijst, current);
+                wisselBewaard(phaseId, current);
+                setStatus(was ? "Niet meer bewaard." : "Bewaard.");
+              }}
+            >
+              {isBewaard(bewaardLijst, current) ? "♥ Bewaard" : "♡ Bewaar"}
+            </button>
+          </div>
+          <span role="status" aria-live="polite" className="fr-status">{status}</span>
+        </div>
         <p className="fr-tip">{adv.tip}</p>
         <div className="fr-machine" role="group" aria-label="Welk apparaat heb je?">
           <span>Ik heb:</span>

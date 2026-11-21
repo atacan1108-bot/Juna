@@ -125,8 +125,8 @@ export function cycleDay(s: CycleSettings, today = new Date()) {
   return (diff % s.cycleLength) + 1;
 }
 
-export function computeToday(s: CycleSettings) {
-  const day = cycleDay(s);
+export function computeToday(s: CycleSettings, op = new Date()) {
+  const day = cycleDay(s, op);
   const phase = phaseForDay(day, s);
   const daysToPeriod = s.cycleLength - day + 1;
   return { day, phase, daysToPeriod };

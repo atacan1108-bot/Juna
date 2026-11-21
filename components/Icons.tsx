@@ -119,3 +119,19 @@ export function Logo({ size = 36, bg = "#FFF7F2" }: { size?: number; bg?: string
     </span>
   );
 }
+
+export const IconCart = (p: P) => (
+  <Svg {...p}>
+    <path d="M6 6h15l-2 9H8zM6 6L5 3H2" />
+    <circle cx="9" cy="20" r="1" />
+    <circle cx="18" cy="20" r="1" />
+  </Svg>
+);
+export const IconBook = (p: P) => (
+  <Svg {...p}>
+    <rect x="4" y="4" width="7" height="7" rx="2" />
+    <rect x="13" y="4" width="7" height="7" rx="2" />
+    <rect x="4" y="13" width="7" height="7" rx="2" />
+    <rect x="13" y="13" width="7" height="7" rx="2" />
+  </Svg>
+);
