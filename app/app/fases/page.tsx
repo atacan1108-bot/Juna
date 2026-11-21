@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import { PhaseIcon } from "@/components/Icons";
 import { computeToday, phaseRanges, useCycle } from "@/lib/cycle";
 import { PHASES, getRecipe, type PhaseId } from "@/lib/data";
+import { receptOk, useVoorkeuren } from "@/lib/voorkeuren";
 
 export default function Fases() {
+  const { uitgesloten } = useVoorkeuren();
   const cycle = useCycle();
   const [picked, setPicked] = useState<PhaseId>("luteaal");
   const [current, setCurrent] = useState<PhaseId | null>(null);
@@ -86,7 +88,7 @@ export default function Fases() {
 
       <h2 style={{ fontWeight: 700, fontSize: 19 }}>Sapjes voor deze fase</h2>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {p.recipes.map((slug) => {
+        {p.recipes.filter((slug) => receptOk(getRecipe(slug)!, uitgesloten)).map((slug) => {
           const r = getRecipe(slug)!;
           return (
             <Link key={slug} href={`/app/recept/${slug}`} className="list-recipe" style={{ alignItems: "flex-start" }}>

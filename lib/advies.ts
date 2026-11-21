@@ -20,14 +20,18 @@ export function sapPunten(ids: string[]) {
   return ids.reduce((n, id) => n + (ING[id]?.sap ?? 0), 0);
 }
 
-export function advies(ids: string[], machine: Machine): Advies {
+export function advies(ids: string[], machine: Machine, uitgesloten: string[] = []): Advies {
   const ings = ids.map((id) => ING[id]);
   const zacht = ings.filter((i) => i.bereiding === "mix"); // gaat niet door een slow juicer
   const poeder = ings.filter((i) => i.bereiding === "toevoegen");
   const punten = sapPunten(ids);
   const weinigSap = punten < 6;
   const romig = ids.some((id) => ROMIG.includes(id));
-  const vloeistof = romig ? "kokosmelk, amandelmelk of haverdrink" : "water of kokoswater";
+  const opties = (romig
+    ? [["kokos", "kokosmelk"], ["almond", "amandelmelk"], ["haver", "haverdrink"], ["", "water"]]
+    : [["", "water"], ["kokos", "kokoswater"]]
+  ).filter(([id]) => !id || !uitgesloten.includes(id));
+  const vloeistof = lijst(opties.map(([, naam]) => naam)).replace(/ en ([^ ]+)$/, " of $1");
   const zachtNamen = lijst(zacht.map((i) => i.naam.toLowerCase()));
   const bladNamen = ings.filter((i) => i.groep === "blad" || i.id === "parsley" || i.id === "mint").map((i) => i.naam.toLowerCase());
 
@@ -61,7 +65,8 @@ export function advies(ids: string[], machine: Machine): Advies {
     const delen: string[] = [];
     if (zacht.length) delen.push(`${zachtNamen.charAt(0).toUpperCase() + zachtNamen.slice(1)} ${zacht.length > 1 ? "geven" : "geeft"} geen sap in een slow juicer.`);
     if (bladNamen.length && weinigSap) delen.push("Bladgroen en kruiden geven ook weinig sap.");
-    delen.push(`Tip: voeg ${vloeistof} toe, of een geperst sap van appel of sinaasappel, zodat het echt een drankje wordt.`);
+    const sap = ["apple", "orange"].filter((id) => !uitgesloten.includes(id)).map((id) => (id === "apple" ? "appel" : "sinaasappel"));
+    delen.push(`Tip: voeg ${vloeistof} toe${sap.length ? `, of een geperst sap van ${sap.join(" of ")},` : ""} zodat het echt een drankje wordt.`);
     popup = { titel: "Tip voor je slow juicer", tekst: delen.join(" ") };
   }
   return { tip, popup };
