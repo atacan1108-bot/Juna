@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { IconLock } from "@/components/Icons";
 import { checkStarts, clearCycle, gemiddelden, loadHistory, saveCycle, saveHistory, useCycle } from "@/lib/cycle";
+import DatePicker from "@/components/DatePicker";
 import VoorkeurKiezer from "@/components/VoorkeurKiezer";
 import VoorkeurTelling from "@/components/VoorkeurTelling";
 import { clearVoorkeuren, saveVoorkeuren, useVoorkeuren } from "@/lib/voorkeuren";
@@ -131,7 +132,7 @@ export default function Koppelen() {
       <form id="cyclus" onSubmit={submit} className="card" style={{ display: "flex", flexDirection: "column", gap: 16, borderRadius: 22 }} noValidate>
         <div className="field">
           <label htmlFor="start">Eerste dag van je laatste menstruatie</label>
-          <input id="start" type="date" value={start} max={today} onChange={(e) => setStart(e.target.value)} required />
+          <DatePicker id="start" value={start} max={today} onChange={setStart} />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -143,7 +144,7 @@ export default function Koppelen() {
             <div key={i} style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 72px 44px", gap: 8, alignItems: "end" }}>
               <div className="field">
                 <label htmlFor={`e${i}`}>{r.start ? `Menstruatie in ${maandNaam(r.start)}` : `${i + 1} ${i === 0 ? "maand" : "maanden"} eerder`}</label>
-                <input id={`e${i}`} type="date" value={r.start} max={today} onChange={(ev) => setEerder((l) => l.map((x, j) => (j === i ? { ...x, start: ev.target.value } : x)))} />
+                <DatePicker id={`e${i}`} value={r.start} max={today} onChange={(v) => setEerder((l) => l.map((x, j) => (j === i ? { ...x, start: v } : x)))} />
               </div>
               <div className="field">
                 <label htmlFor={`p${i}`}>Dagen</label>
