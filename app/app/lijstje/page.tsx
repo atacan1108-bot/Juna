@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { computeToday, useCycle } from "@/lib/cycle";
 import { getPhase, getRecipe } from "@/lib/data";
 import { AMT, ING, weekId } from "@/lib/ingredients";
-import { lijstStore, schudVolgende, vastStore, volgendeSet, volgendeStore, weekOver, zetOpLijst, type LijstItem } from "@/lib/mijn";
+import { hoeveelheid, BEWAAR } from "@/lib/porties";
+import { lijstStore, portiesStore, schudVolgende, vastStore, volgendeSet, volgendeStore, weekOver, zetOpLijst, type LijstItem } from "@/lib/mijn";
 import { useVoorkeuren } from "@/lib/voorkeuren";
 
 function Rij({ set }: { set: string[] }) {
@@ -25,6 +26,16 @@ function Rij({ set }: { set: string[] }) {
   );
 }
 
+function bewaarMachine(): "mixer" | "slowjuicer" | "beide" {
+  try {
+    const m = localStorage.getItem("juna.machine.v1");
+    if (m === "mixer" || m === "slowjuicer") return m;
+  } catch {
+    /* ignore */
+  }
+  return "beide";
+}
+
 export default function Lijstje() {
   const router = useRouter();
   const cycle = useCycle();
@@ -32,6 +43,7 @@ export default function Lijstje() {
   const vast = vastStore.useHook();
   const lijst = lijstStore.useHook();
   const opgeslagen = volgendeStore.useHook();
+  const sapjes = portiesStore.useHook();
   const [eigen, setEigen] = useState("");
   const [status, setStatus] = useState("");
   const [vervaag, setVervaag] = useState(false);
@@ -66,6 +78,22 @@ export default function Lijstje() {
         <span style={{ fontSize: 13, color: "var(--muted)" }}>{lijst.length ? `${lijst.length - open} van ${lijst.length}` : ""}</span>
       </div>
 
+      <div className="card" style={{ borderRadius: 22, display: "flex", flexDirection: "column", gap: 10 }}>
+        <span className="eyebrow" style={{ color: "var(--muted)" }}>Voor hoeveel sapjes doe je boodschappen?</span>
+        <div className="segmented" role="group" aria-label="Aantal sapjes">
+          {[1, 2, 3].map((n) => (
+            <button key={n} type="button" aria-pressed={sapjes === n} onClick={() => portiesStore.bewaar(n)}>
+              {n === 1 ? "1 sapje" : `${n} sapjes`}
+            </button>
+          ))}
+        </div>
+        <span style={{ fontSize: 13, lineHeight: 1.45, color: "var(--ink-2)" }}>
+          {sapjes === 1
+            ? "Je ziet de hoeveelheden voor één sapje. Bij veel fruit koop je meer dan je nodig hebt, daarom staat er ook wat je overhoudt."
+            : `Je ziet wat je nodig hebt voor ${sapjes} sapjes van dezelfde combinatie, en wat je daarvoor koopt.`}
+        </span>
+      </div>
+
       {lijst.length === 0 ? (
         <p style={{ fontSize: 14, lineHeight: 1.5, color: "var(--ink-2)", margin: 0 }}>
           Je lijstje is nog leeg. Tik op de startpagina bij je sapje op &ldquo;Zet op lijstje&rdquo;, of voeg hieronder zelf iets toe.
@@ -87,7 +115,16 @@ export default function Lijstje() {
                     ) : null}
                     <span className="lj-n">
                       {i.naam}
-                      <small>{i.ing ? `${AMT[i.ing]}${i.bron.length > 1 ? ` · ${i.bron.length} sapjes` : ""}` : "Eigen item"}</small>
+                      {i.ing ? (() => {
+                        const totaalSapjes = sapjes * Math.max(1, i.bron.length);
+                        const h = hoeveelheid(i.ing, totaalSapjes);
+                        return (
+                          <>
+                            <small>{h.nodig}{totaalSapjes > 1 ? ` · voor ${totaalSapjes} sapjes` : ""}</small>
+                            {h.koop ? <small>Koop: {h.koop}{h.rest ? `. ${h.rest}` : ""}</small> : null}
+                          </>
+                        );
+                      })() : <small>Eigen item</small>}
                     </span>
                   </button>
                 ))}
@@ -168,6 +205,19 @@ export default function Lijstje() {
         )}
       </section>
 
+      {sapjes > 1 ? (
+        <div className="card" style={{ borderRadius: 22, display: "flex", flexDirection: "column", gap: 6 }}>
+          <strong style={{ fontSize: 15 }}>Zo bewaar je je sap</strong>
+          <span style={{ fontSize: 13, lineHeight: 1.45 }}>{BEWAAR[bewaarMachine()]}</span>
+          <span style={{ fontSize: 13, lineHeight: 1.45 }}>
+            Giet het in schone, afgesloten flessen, zo vol mogelijk, en zet ze achterin de koelkast. Een schijfje citroen of limoen helpt. Schud even voor het drinken.
+          </span>
+          <span style={{ fontSize: 13, lineHeight: 1.45 }}>Meer sap dan je opkrijgt? Vries het in porties in.</span>
+          <span style={{ fontSize: 12.5, lineHeight: 1.45, color: "var(--muted)" }}>
+            Voor jonge kinderen, zwangeren en ouderen is het veiliger om vers sap dezelfde dag te drinken.
+          </span>
+        </div>
+      ) : null}
       <span style={{ fontSize: 12.5, lineHeight: 1.45, color: "var(--ink-2)" }}>
         Juna houdt rekening met je allergieën en voorkeuren. Zet je meerdere weken op je lijstje, dan telt Juna dezelfde ingrediënten bij elkaar op. Je lijstje blijft alleen op dit toestel.
       </span>

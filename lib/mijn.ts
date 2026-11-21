@@ -60,6 +60,9 @@ const ids = (v: unknown): string[] => (Array.isArray(v) ? Array.from(new Set(v.f
 /* ---- gekozen extra (huid of haar) ---- */
 export const extraStore = maak<"huid" | "haar" | null>("juna.extra.v1", null, (v) => (v === "huid" || v === "haar" ? v : null));
 
+/* ---- voor hoeveel sapjes ga je boodschappen doen (1 tot 3) ---- */
+export const portiesStore = maak<number>("juna.porties.v1", 1, (v) => (v === 2 || v === 3 ? v : 1));
+
 /* ---- vastgezet ingrediënt (maximaal één) ---- */
 const LEEG_VAST: string | null = null;
 export const vastStore = maak<string | null>("juna.vast.v1", LEEG_VAST, (v) => (typeof v === "string" && ING[v] ? v : null));
@@ -193,6 +196,7 @@ export function wisAlleMijn() {
   lijstStore.wis();
   volgendeStore.wis();
   extraStore.wis();
+  portiesStore.wis();
   try {
     localStorage.removeItem(GEMAAKT_KEY);
     localStorage.removeItem("juna.fruit.set.v1");
