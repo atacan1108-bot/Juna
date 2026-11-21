@@ -35,12 +35,6 @@ function maandNaam(iso: string) {
   return `${MAANDEN[m - 1]} ${j}`;
 }
 
-const CONNECTORS = [
-  { l: "F", n: "Flo", d: "Via Health Connect / Apple Health", bg: "var(--berry-t)", c: "var(--berry-d)" },
-  { l: "A", n: "Apple Health", d: "iPhone & Apple Watch", bg: "var(--orange-t)", c: "var(--orange-d)" },
-  { l: "G", n: "Health Connect", d: "Android", bg: "var(--green-t)", c: "var(--green-d)" },
-];
-
 export default function Koppelen() {
   const router = useRouter();
   const cycle = useCycle();
@@ -50,7 +44,6 @@ export default function Koppelen() {
   const [length, setLength] = useState(28);
   const [period, setPeriod] = useState(5);
   const [error, setError] = useState("");
-  const [note, setNote] = useState("");
   const [eerder, setEerder] = useState<{ start: string; period: string }[]>([]);
 
   useEffect(() => {
@@ -93,41 +86,10 @@ export default function Koppelen() {
   return (
     <main className="app-main">
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        <h1 className="display" style={{ fontSize: 30, lineHeight: 1.05 }}>Koppel je cyclus</h1>
+        <h1 className="display" style={{ fontSize: 30, lineHeight: 1.05 }}>Vul je cyclus in</h1>
         <p style={{ fontSize: 15, lineHeight: 1.45, color: "var(--ink-2)" }}>
           Juna gebruikt je menstruatiedagen om te bepalen in welke fase je zit, zodat je sapjes automatisch meeschuiven.
         </p>
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {CONNECTORS.map((x) => (
-          <div key={x.n} className="card" style={{ display: "flex", gap: 14, alignItems: "center", borderRadius: 22 }}>
-            <span className="letter-tile" style={{ width: 48, height: 48, borderRadius: 14, background: x.bg, color: x.c, fontSize: 20 }}>{x.l}</span>
-            <span style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1 }}>
-              <strong>{x.n}</strong>
-              <span style={{ fontSize: 13, color: "var(--muted)" }}>{x.d}</span>
-            </span>
-            <button
-              type="button"
-              className="btn btn-light"
-              style={{ minHeight: 44, padding: "0 14px", fontSize: 14, borderRadius: 14 }}
-              onClick={() => setNote(`${x.n} koppelen komt in de mobiele app. Vul hieronder voorlopig zelf je datum in.`)}
-            >
-              Koppel
-            </button>
-          </div>
-        ))}
-        {note && (
-          <p role="status" style={{ fontSize: 13, color: "var(--violet-d)", background: "var(--violet-t)", padding: "10px 14px", borderRadius: 14 }}>
-            {note}
-          </p>
-        )}
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--muted)", fontSize: 13 }}>
-        <span style={{ flex: 1, height: 1, background: "#E6D5DF" }} />
-        of vul zelf in
-        <span style={{ flex: 1, height: 1, background: "#E6D5DF" }} />
       </div>
 
       <form id="cyclus" onSubmit={submit} className="card" style={{ display: "flex", flexDirection: "column", gap: 16, borderRadius: 22 }} noValidate>

@@ -24,7 +24,7 @@ export default function Home() {
           <a href="#hoe">Hoe het werkt</a>
           <a href="#fases">De 4 fases</a>
           <a href="#glow">Glow &amp; haar</a>
-          <a href="#koppelen">Flo koppelen</a>
+          <a href="#privacy">Jouw data</a>
         </nav>
         <Link href="/app" className="btn btn-dark btn-pill" style={{ minHeight: 46, fontSize: 15 }}>
           Open de app
@@ -97,7 +97,7 @@ export default function Home() {
             <h2 className="section-title">Zo werkt Juna</h2>
             <div className="grid-auto" style={{ gap: 24 }}>
               {[
-                { n: "1", c: "#F59CBD", t: "Koppel je cyclus", d: "Vul de eerste dag van je laatste menstruatie in. Binnenkort ook automatisch via Flo, Apple Health en Health Connect." },
+                { n: "1", c: "#F59CBD", t: "Vul je cyclus in", d: "Vul de eerste dag van je laatste menstruatie in. Meer heeft Juna niet nodig om te weten in welke fase je zit." },
                 { n: "2", c: "#9BD69A", t: "Krijg je sap van de week", d: "Elke fase een nieuw recept, met ingrediënten en een korte uitleg waarom het past bij wat je lichaam nu doet." },
                 { n: "3", c: "#F7B66E", t: "Glow & haar erbij", d: "Kies je doel – stralende huid of sterkere haargroei – en Juna voegt daar passende sapjes en tips aan toe." },
               ].map((s) => (
@@ -180,34 +180,14 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="koppelen" className="container section" style={{ display: "flex", flexWrap: "wrap", gap: 48, alignItems: "center" }}>
-          <div style={{ flex: "999 1 480px", minWidth: 0, display: "flex", flexDirection: "column", gap: 18 }}>
-            <h2 className="section-title">Gebruik je Flo al? Mooi.</h2>
-            <p className="lead" style={{ fontSize: 18 }}>
-              Straks leest Juna je cyclusdata uit Flo via Apple Health of Google Health Connect. Jij hoeft niets
-              dubbel bij te houden – je sapjes schuiven automatisch mee als je cyclus verandert.
-            </p>
-            <p style={{ fontSize: 15, lineHeight: 1.55, color: "var(--muted)" }}>
-              Je data blijft van jou: alleen lezen, alleen met jouw toestemming. In deze testversie blijft alles
-              op je eigen toestel.
-            </p>
-          </div>
-          <div style={{ flex: "1 1 380px", minWidth: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-            {[
-              { l: "F", n: "Flo", d: "Menstruatie- en ovulatiedagen", bg: "var(--berry-t)", c: "var(--berry-d)" },
-              { l: "A", n: "Apple Health", d: "iPhone & Apple Watch", bg: "var(--orange-t)", c: "var(--orange-d)" },
-              { l: "G", n: "Health Connect", d: "Android", bg: "var(--green-t)", c: "var(--green-d)" },
-            ].map((x) => (
-              <div key={x.n} className="connector">
-                <span className="letter-tile" style={{ background: x.bg, color: x.c }}>{x.l}</span>
-                <span style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                  <strong>{x.n}</strong>
-                  <span style={{ fontSize: 14, color: "var(--muted)" }}>{x.d}</span>
-                </span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>Binnenkort</span>
-              </div>
-            ))}
-          </div>
+        <section id="privacy" className="container section" style={{ display: "flex", flexDirection: "column", gap: 18, maxWidth: 720 }}>
+          <h2 className="section-title">Jouw data blijft van jou.</h2>
+          <p className="lead" style={{ fontSize: 18 }}>
+            Juna werkt los van andere apps. Jij vult zelf je cyclus in en je sapjes schuiven mee als je cyclus verandert.
+          </p>
+          <p style={{ fontSize: 15, lineHeight: 1.55, color: "var(--muted)" }}>
+            In deze testversie blijft alles wat je invult op je eigen toestel.
+          </p>
         </section>
 
         <section style={{ background: "var(--violet)", color: "#fff" }}>
