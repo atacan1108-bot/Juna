@@ -41,6 +41,11 @@ export const UITLEG: Record<ExtraDoel, string> = {
   haar: "Haar bestaat uit eiwit. Pitten en noten leveren eiwit en zink, groene bladgroente levert ijzer.",
 };
 
+export const MEEDENK: Record<ExtraDoel, string> = {
+  huid: "Juna denkt mee bij je sapje en geeft je een tip om erbij te doen.",
+  haar: "Juna kijkt mee naar je sapje en zegt wat er lekker bij past.",
+};
+
 export const MEEDENKEN = "Juna denkt mee bij je sapje en geeft je tips om erbij te doen.";
 
 export const SHOT_BEREIDING = "Pers de ingrediënten in je slow juicer, of mix ze met een scheut water en zeef ze. Je krijgt ongeveer 60 ml.";

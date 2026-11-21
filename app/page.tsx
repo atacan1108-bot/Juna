@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PHASES, getRecipe } from "@/lib/data";
-import { MEEDENKEN, UITLEG } from "@/lib/extras";
+import { MEEDENK, UITLEG } from "@/lib/extras";
 import { IconSparkle, IconWave, Logo, PhaseIcon } from "@/components/Icons";
 
 const phaseDays: Record<string, string> = {
@@ -158,8 +158,8 @@ export default function Home() {
             </div>
             <div className="grid-auto-wide">
               {[
-                { title: "Voor je huid", icon: <IconSparkle size={26} color="#B35A0F" />, tile: "var(--orange-t)", text: `${UITLEG.huid} ${MEEDENKEN}`, toe: "Bijvoorbeeld avocado, kiwi of wortel.", shot: "Een klein shotje van ongeveer 60 ml, zoals een oranje huidshotje met wortel en sinaasappel." },
-                { title: "Voor je haar", icon: <IconWave size={26} color="var(--green-d)" />, tile: "var(--green-t)", text: `${UITLEG.haar} ${MEEDENKEN}`, toe: "Bijvoorbeeld pompoenpitten, amandelen of spinazie.", shot: "Een klein shotje van ongeveer 60 ml, zoals een groen haarshotje met spinazie, appel en citroen." },
+                { title: "Voor je huid", icon: <IconSparkle size={26} color="#B35A0F" />, tile: "var(--orange-t)", text: `${UITLEG.huid} ${MEEDENK.huid}`, toe: "Bijvoorbeeld avocado, kiwi of wortel.", shot: "Een klein shotje van ongeveer 60 ml, zoals een oranje huidshotje met wortel en sinaasappel." },
+                { title: "Voor je haar", icon: <IconWave size={26} color="var(--green-d)" />, tile: "var(--green-t)", text: `${UITLEG.haar} ${MEEDENK.haar}`, toe: "Bijvoorbeeld pompoenpitten, amandelen of spinazie.", shot: "Een klein shotje van ongeveer 60 ml, zoals een groen haarshotje met spinazie, appel en citroen." },
               ].map((g) => (
                 <div key={g.title} className="goal-card">
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
