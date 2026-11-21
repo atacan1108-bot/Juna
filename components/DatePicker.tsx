@@ -16,21 +16,28 @@ type Props = { id: string; value: string; max?: string; onChange: (v: string) =>
 
 /** Kalender in de stijl van Juna, in plaats van de standaardkiezer van de browser. */
 export default function DatePicker({ id, value, max, onChange }: Props) {
-  const nu = new Date();
-  const start = value ? value.split("-").map(Number) : [nu.getFullYear(), nu.getMonth() + 1];
+  const basis = (value || max || "2026-01-01").split("-").map(Number);
   const [open, setOpen] = useState(false);
-  const [jaar, setJaar] = useState(start[0]);
-  const [maand, setMaand] = useState(start[1] - 1);
+  const [jaar, setJaar] = useState(basis[0]);
+  const [maand, setMaand] = useState(basis[1] - 1);
+  const [vandaag, setVandaag] = useState("");
   const wrap = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (open && value) {
-      const [j, m] = value.split("-").map(Number);
+    const nu = new Date();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setVandaag(iso(nu.getFullYear(), nu.getMonth(), nu.getDate()));
+  }, []);
+
+  useEffect(() => {
+    const bron = value || max || vandaag;
+    if (open && bron) {
+      const [j, m] = bron.split("-").map(Number);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setJaar(j);
       setMaand(m - 1);
     }
-  }, [open, value]);
+  }, [open, value, max, vandaag]);
 
   useEffect(() => {
     if (!open) return;
@@ -47,7 +54,6 @@ export default function DatePicker({ id, value, max, onChange }: Props) {
 
   const eerste = (new Date(jaar, maand, 1).getDay() + 6) % 7;
   const aantal = new Date(jaar, maand + 1, 0).getDate();
-  const vandaag = iso(nu.getFullYear(), nu.getMonth(), nu.getDate());
   const maxMaand = max ? max.slice(0, 7) : "";
   const volgendeKan = !maxMaand || iso(jaar, maand, 1).slice(0, 7) < maxMaand;
   const cellen: (number | null)[] = [...Array(eerste).fill(null), ...Array.from({ length: aantal }, (_, i) => i + 1)];
