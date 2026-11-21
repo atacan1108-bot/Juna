@@ -62,15 +62,7 @@ export default function Vandaag() {
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <h2 style={{ fontWeight: 700, fontSize: 20 }}>Jouw {recipe.kind === "smoothie" ? "smoothie" : "sap"} van deze week</h2>
         <div className="fr-card" style={{ background: phase.tint, color: "#2E1428" }}>
-          <FruitRain phase={phaseId} />
-          <Link href={`/app/recept/${recipe.slug}`} className="fr-info" style={{ textDecoration: "none", color: "inherit" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span className="display" style={{ fontSize: 32, color: phase.dark }}>{recipe.name}</span>
-              <span className="chip" style={{ background: "#fff", color: phase.dark }}>{recipe.minutes} min</span>
-            </div>
-            <span style={{ fontSize: 14, lineHeight: 1.45 }}>{recipe.short}</span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: phase.dark }}>Bekijk recept →</span>
-          </Link>
+          <FruitRain phase={{ ...phase, recipeName: recipe.name }} />
         </div>
       </div>
 
