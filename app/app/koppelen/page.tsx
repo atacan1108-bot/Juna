@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { IconLock } from "@/components/Icons";
 import { checkStarts, clearCycle, gemiddelden, loadHistory, saveCycle, saveHistory, useCycle } from "@/lib/cycle";
 import VoorkeurKiezer from "@/components/VoorkeurKiezer";
+import VoorkeurTelling from "@/components/VoorkeurTelling";
 import { clearVoorkeuren, saveVoorkeuren, useVoorkeuren } from "@/lib/voorkeuren";
 
 function isoDaysAgo(n: number) {
@@ -185,6 +186,7 @@ export default function Koppelen() {
       </div>
       <VoorkeurKiezer id="allergie" titel="Allergie of intolerantie" uitleg="Hier laat Juna het ingrediënt altijd weg. Controleer bij een ernstige allergie altijd zelf de verpakking." waarde={allergie} anderen={nietLekker} onChange={(ids) => saveVoorkeuren({ allergie: ids, nietLekker: nietLekker.filter((x) => !ids.includes(x)) })} />
       <VoorkeurKiezer id="nietlekker" titel="Dit vind ik niet lekker" uitleg="Een smaakkeuze. Juna laat dit weg uit jouw sapjes." waarde={nietLekker} anderen={allergie} onChange={(ids) => saveVoorkeuren({ allergie, nietLekker: ids })} />
+      <VoorkeurTelling uitgesloten={[...allergie, ...nietLekker]} />
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {error && (

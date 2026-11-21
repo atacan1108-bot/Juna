@@ -4,9 +4,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import VoorkeurKiezer from "@/components/VoorkeurKiezer";
+import VoorkeurTelling from "@/components/VoorkeurTelling";
 import { IconLock } from "@/components/Icons";
-import { beschikbaar } from "@/lib/ingredients";
-import { PHASES, getRecipe } from "@/lib/data";
 import { useCycle } from "@/lib/cycle";
 import { saveVoorkeuren, useVoorkeuren } from "@/lib/voorkeuren";
 
@@ -16,8 +15,6 @@ function Inhoud() {
   const { allergie, nietLekker, uitgesloten } = useVoorkeuren();
   const cycle = useCycle();
 
-  const telling = PHASES.map((p) => ({ naam: getRecipe(p.recipes[0])?.name ?? p.label, label: p.label, n: beschikbaar(p.id, uitgesloten).length }));
-  const leeg = telling.filter((t) => t.n === 0);
 
   return (
     <main className="app-main">
@@ -46,18 +43,7 @@ function Inhoud() {
         onChange={(ids) => saveVoorkeuren({ allergie, nietLekker: ids })}
       />
 
-      <div className="card" style={{ borderRadius: 22, display: "flex", flexDirection: "column", gap: 6 }} role="status">
-        <strong style={{ fontSize: 15 }}>Zo blijft het variëren</strong>
-        {leeg.length ? (
-          <span style={{ fontSize: 14, lineHeight: 1.45, color: "var(--berry-d)" }}>
-            Voor {leeg.map((t) => t.label.toLowerCase()).join(" en ")} blijft er geen sapje over. Haal een voorkeur weg, dan zoekt Juna weer combinaties. Allergieën laat Juna altijd staan.
-          </span>
-        ) : (
-          <span style={{ fontSize: 14, lineHeight: 1.45 }}>
-            Aantal verschillende sapjes die overblijven: {telling.map((t) => `${t.naam} ${t.n}`).join(", ")}.
-          </span>
-        )}
-      </div>
+      <VoorkeurTelling uitgesloten={uitgesloten} />
 
       <div style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "0 4px" }}>
         <IconLock size={20} color="var(--violet-d)" />
