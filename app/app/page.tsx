@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import CycleRing from "@/components/CycleRing";
+import FruitRain from "@/components/FruitRain";
 import { IconSparkle, IconWave } from "@/components/Icons";
 import { computeToday, useCycle } from "@/lib/cycle";
 import { getPhase, getRecipe } from "@/lib/data";
+import { tipLink, weekTips } from "@/lib/tips";
 
 const fmt = new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long" });
 
@@ -60,32 +62,32 @@ export default function Vandaag() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <h2 style={{ fontWeight: 700, fontSize: 20 }}>Jouw {recipe.kind === "smoothie" ? "smoothie" : "sap"} van deze week</h2>
-        <Link href={`/app/recept/${recipe.slug}`} className="recipe-hero" style={{ background: phase.color }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-            <div className="stack-dots" style={{ color: phase.color }}>
-              {recipe.colors.map((c, i) => (
-                <span key={i} style={{ background: c }} />
-              ))}
-            </div>
-            <span className="chip" style={{ background: "#fff", color: phase.dark }}>{recipe.minutes} min</span>
-          </div>
-          <span className="display" style={{ fontSize: 26 }}>{recipe.name}</span>
-          <span style={{ fontSize: 14, lineHeight: 1.45 }}>{recipe.short}</span>
-          <span style={{ fontSize: 14, fontWeight: 700 }}>Bekijk recept →</span>
-        </Link>
+        <div className="fr-card" style={{ background: phase.tint, color: "#2E1428" }}>
+          <FruitRain phase={{ ...phase, recipeName: recipe.name }} />
+        </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10 }}>
-        <Link href="/app/glow" style={{ textDecoration: "none", background: "var(--orange-t)", borderRadius: 22, padding: 14, display: "flex", flexDirection: "column", gap: 6 }}>
-          <IconSparkle size={22} color="var(--orange-d)" />
-          <span className="eyebrow" style={{ color: "var(--orange-d)" }}>Glow-tip</span>
-          <span style={{ fontSize: 13, lineHeight: 1.35 }}>{phase.skin}</span>
-        </Link>
-        <Link href="/app/glow?doel=haar" style={{ textDecoration: "none", background: "var(--green-t)", borderRadius: 22, padding: 14, display: "flex", flexDirection: "column", gap: 6 }}>
-          <IconWave size={22} color="var(--green-d)" />
-          <span className="eyebrow" style={{ color: "var(--green-d)" }}>Haar</span>
-          <span style={{ fontSize: 13, lineHeight: 1.35 }}>{phase.hair}</span>
-        </Link>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10 }}>
+          {weekTips(phaseId).map((tip, i) => {
+            const link = tipLink(tip);
+            const kleur = i === 0 ? "var(--orange-d)" : "var(--green-d)";
+            const stijl = { textDecoration: "none", color: "inherit", background: i === 0 ? "var(--orange-t)" : "var(--green-t)", borderRadius: 22, padding: 14, display: "flex", flexDirection: "column" as const, gap: 6 };
+            const inhoud = (
+              <>
+                {i === 0 ? <IconSparkle size={22} color={kleur} /> : <IconWave size={22} color={kleur} />}
+                <span className="eyebrow" style={{ color: kleur }}>{tip.soort}</span>
+                <span style={{ fontSize: 13, lineHeight: 1.35 }}>{tip.tekst}</span>
+              </>
+            );
+            return link ? (
+              <Link key={tip.tekst} href={link} style={stijl}>{inhoud}</Link>
+            ) : (
+              <div key={tip.tekst} style={stijl}>{inhoud}</div>
+            );
+          })}
+        </div>
+        <span style={{ fontSize: 11, opacity: 0.7, lineHeight: 1.4 }}>Elke week nieuwe tips. Juna geeft geen medisch advies.</span>
       </div>
 
       <div className="card" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
