@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PHASES, RECIPES, getRecipe } from "@/lib/data";
+import { PHASES, getRecipe } from "@/lib/data";
 import { IconSparkle, IconWave, Logo, PhaseIcon } from "@/components/Icons";
 
 const phaseDays: Record<string, string> = {
@@ -10,8 +10,6 @@ const phaseDays: Record<string, string> = {
 };
 
 export default function Home() {
-  const glow = RECIPES.filter((r) => r.category === "glow");
-  const hair = RECIPES.filter((r) => r.category === "haar");
 
   return (
     <div>
@@ -159,8 +157,8 @@ export default function Home() {
             </div>
             <div className="grid-auto-wide">
               {[
-                { title: "Voor je huid", icon: <IconSparkle size={26} color="#B35A0F" />, tile: "var(--orange-t)", text: "Sapjes met vitamine C, bètacaroteen en veel vocht: voedzaam voor je huid. Veel mensen merken dat hun huid door de maand heen verandert, bijvoorbeeld rond je ovulatie of vlak voor je menstruatie.", list: glow },
-                { title: "Voor je haar", icon: <IconWave size={26} color="var(--green-d)" />, tile: "var(--green-t)", text: "Smoothies met ijzer, zink, biotine en eiwit, met voedingsrijke toppings. Juna belooft geen sneller of voller haar. Het zijn gewoon voedzame keuzes.", list: hair },
+                { title: "Voor je huid", icon: <IconSparkle size={26} color="#B35A0F" />, tile: "var(--orange-t)", text: "Toevoegingen en shotjes met vitamine C, bètacaroteen en veel vocht. Veel mensen merken dat hun huid door de maand heen verandert, bijvoorbeeld rond je ovulatie of vlak voor je menstruatie.", toe: "Bijvoorbeeld avocado, kiwi of wortel.", shot: "Een klein shotje van ongeveer 60 ml, zoals een oranje huidshotje met wortel en sinaasappel." },
+                { title: "Voor je haar", icon: <IconWave size={26} color="var(--green-d)" />, tile: "var(--green-t)", text: "Toevoegingen en shotjes met ijzer, zink en eiwit. Juna belooft geen sneller of voller haar. Het zijn gewoon voedzame keuzes.", toe: "Bijvoorbeeld pompoenpitten, amandelen of spinazie.", shot: "Een klein shotje van ongeveer 60 ml, zoals een groen haarshotje met spinazie, appel en citroen." },
               ].map((g) => (
                 <div key={g.title} className="goal-card">
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -168,16 +166,19 @@ export default function Home() {
                     <h3 className="display" style={{ fontSize: 30 }}>{g.title}</h3>
                   </div>
                   <p style={{ lineHeight: 1.55, color: "var(--ink-2)" }}>{g.text}</p>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {g.list.map((r) => (
-                      <Link key={r.slug} href={`/app/recept/${r.slug}`} className="row-item">
-                        <span className="dot" style={{ width: 40, height: 40, background: r.colors[0] }} />
-                        <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                          <strong>{r.name}</strong>
-                          <span style={{ fontSize: 14, color: "var(--muted)" }}>{r.short}</span>
-                        </span>
-                      </Link>
-                    ))}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div className="row-item" style={{ cursor: "default" }}>
+                      <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                        <strong>Voeg toe aan je sapje</strong>
+                        <span style={{ fontSize: 14, color: "var(--muted)" }}>{g.toe}</span>
+                      </span>
+                    </div>
+                    <div className="row-item" style={{ cursor: "default" }}>
+                      <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                        <strong>Of maak een shotje</strong>
+                        <span style={{ fontSize: 14, color: "var(--muted)" }}>{g.shot}</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}

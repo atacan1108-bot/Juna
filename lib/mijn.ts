@@ -57,6 +57,9 @@ function maak<T>(key: string, leeg: T, schoon: (v: unknown) => T) {
 
 const ids = (v: unknown): string[] => (Array.isArray(v) ? Array.from(new Set(v.filter((x): x is string => typeof x === "string" && !!ING[x]))) : []);
 
+/* ---- gekozen extra (huid of haar) ---- */
+export const extraStore = maak<"huid" | "haar" | null>("juna.extra.v1", null, (v) => (v === "huid" || v === "haar" ? v : null));
+
 /* ---- vastgezet ingrediënt (maximaal één) ---- */
 const LEEG_VAST: string | null = null;
 export const vastStore = maak<string | null>("juna.vast.v1", LEEG_VAST, (v) => (typeof v === "string" && ING[v] ? v : null));
@@ -189,6 +192,7 @@ export function wisAlleMijn() {
   bewaardStore.wis();
   lijstStore.wis();
   volgendeStore.wis();
+  extraStore.wis();
   try {
     localStorage.removeItem(GEMAAKT_KEY);
     localStorage.removeItem("juna.fruit.set.v1");
