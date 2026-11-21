@@ -28,6 +28,7 @@ export type Recipe = {
   ingredients: { name: string; amount: string }[];
   steps: string[];
   why: string;
+  whyKort?: string; // korte versie voor de voorpagina
 };
 
 export const PHASES: Phase[] = [
@@ -241,6 +242,7 @@ export const RECIPES: Recipe[] = [
       "Schenk in een glas en strooi de pompoenpitten erover.",
     ],
     why: "In je luteale fase is progesteron hoog en kan je lichaam meer magnesium gebruiken. Cacao en spinazie leveren magnesium en banaan vitamine B6. Of dat PMS-klachten verzacht is niet bewezen, maar het zijn voedzame keuzes die lekker zoet zijn zonder extra suiker.",
+    whyKort: "Cacao en spinazie leveren magnesium, banaan vitamine B6. Natuurlijk zoet, zonder extra suiker.",
   },
   {
     slug: "zoete-wortel",

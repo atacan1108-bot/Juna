@@ -138,7 +138,7 @@ export default function Home() {
                     </span>
                     <span className="display" style={{ fontSize: 20 }}>{r.name}</span>
                     <span style={{ fontSize: 14, lineHeight: 1.45 }}>{r.short}</span>
-                    <span style={{ fontSize: 13, lineHeight: 1.45, color: "var(--muted)" }}>Waarom: {r.why}</span>
+                    <span style={{ fontSize: 13, lineHeight: 1.45, color: "var(--muted)" }}>Waarom: {r.whyKort ?? r.why}</span>
                   </div>
                 </Link>
               );
