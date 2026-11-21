@@ -105,28 +105,27 @@ export default function FruitRain({ phase }: { phase: Phase & { recipeName: stri
     }
   }, [phaseId, sets]);
 
-  const replay = () => {
-    if (reduced()) return;
-    setAnimate(false);
-    setTimeout(() => {
-      setRun((n) => n + 1);
-      setAnimate(true);
-    }, 80);
-  };
+  // Eerst de oude stapel weghalen (leeg vak), dan pas de nieuwe laten vallen.
+  const [leeg, setLeeg] = useState(false);
 
-  const shuffle = () => {
-    setSets((prev) => [...prev, schudSet(phaseId, prev)]);
+  const opnieuw = (nieuweSet?: () => void) => {
     if (reduced()) {
+      nieuweSet?.();
       setAnimate(false);
       setRun((n) => n + 1);
       return;
     }
-    setAnimate(false);
+    setLeeg(true);
     setTimeout(() => {
+      nieuweSet?.();
       setRun((n) => n + 1);
       setAnimate(true);
-    }, 80);
+      setLeeg(false);
+    }, 150);
   };
+
+  const replay = () => opnieuw();
+  const shuffle = () => opnieuw(() => setSets((prev) => [...prev, schudSet(phaseId, prev)]));
 
   const box = (p: Piece) => ({
     left: cq(p.left),
@@ -138,26 +137,26 @@ export default function FruitRain({ phase }: { phase: Phase & { recipeName: stri
   return (
     <>
       <div className="fruit-stage" onClick={replay} role="img" aria-label={`Fruit van deze week: ${ings.map((i) => i.naam).join(", ")}. Tik om opnieuw af te spelen`} key={run}>
-        {shadows.map((sh, i) => (
+        {leeg ? null : shadows.map((sh, i) => (
           <span
             key={`s${i}`}
             className={animate ? "fr-shade fr-anim" : "fr-shade"}
             style={{ left: cq(sh.left), top: cq(436 - OFFSET), width: cq(sh.w), height: cq(8), animationDelay: `${sh.delay.toFixed(2)}s` }}
           />
         ))}
-        {items.map((p, i) => (
+        {leeg ? null : items.map((p, i) => (
           <span key={i} className={animate ? "fr-fruit fr-anim" : "fr-fruit"} style={{ ...box(p), animationDelay: `${p.delay.toFixed(2)}s` }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={p.src} alt="" draggable={false} style={{ transform: `rotate(${p.rot}deg)` }} />
           </span>
         ))}
-        {left.map((p, i) => (
+        {leeg ? null : left.map((p, i) => (
           <span key={`l${i}`} className={animate ? "fr-roll-l fr-anim" : "fr-gone"} style={{ ...box(p), animationDelay: `${p.delay.toFixed(2)}s`, animationDuration: `${p.dur}s` }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={p.src} alt="" draggable={false} />
           </span>
         ))}
-        {right.map((p, i) => (
+        {leeg ? null : right.map((p, i) => (
           <span key={`r${i}`} className={animate ? "fr-roll-r fr-anim" : "fr-gone"} style={{ ...box(p), animationDelay: `${p.delay.toFixed(2)}s`, animationDuration: `${p.dur}s` }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={p.src} alt="" draggable={false} />
